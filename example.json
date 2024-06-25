@@ -1,0 +1,497 @@
+{
+    "monitors": {
+      "elements": [
+        {
+          "id": 917809,
+          "name": "DISPLAY11",
+          "device": "AUS27E1",
+          "device_id": "AUS27E1-5&aa04a24&0&UID4352",
+          "size": {
+            "left": 0,
+            "top": 0,
+            "right": 3840,
+            "bottom": 2160
+          },
+          "work_area_size": {
+            "left": 0,
+            "top": 0,
+            "right": 3840,
+            "bottom": 2160
+          },
+          "work_area_offset": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "window_based_work_area_offset": null,
+          "window_based_work_area_offset_limit": 1,
+          "workspaces": {
+            "elements": [
+              {
+                "name": "1",
+                "containers": {
+                  "elements": [
+                    {
+                      "id": "KMDiby2bSwH1Ly9P5NxxJ",
+                      "windows": {
+                        "elements": [
+                          {
+                            "hwnd": 68046,
+                            "title": "In-chat commands | aider – Mozilla Firefox",
+                            "exe": "firefox.exe",
+                            "class": "MozillaWindowClass",
+                            "rect": {
+                              "left": 0,
+                              "top": 0,
+                              "right": 1920,
+                              "bottom": 2160
+                            }
+                          }
+                        ],
+                        "focused": 0
+                      }
+                    },
+                    {
+                      "id": "Cj-8lFXfXAft1p2y0GQKY",
+                      "windows": {
+                        "elements": [
+                          {
+                            "hwnd": 4986288,
+                            "title": "[3/5]  ⚡ Seelen-UI @ ReyRey",
+                            "exe": "wezterm-gui.exe",
+                            "class": "org.wezfurlong.wezterm",
+                            "rect": {
+                              "left": 1920,
+                              "top": 0,
+                              "right": 1920,
+                              "bottom": 2160
+                            }
+                          }
+                        ],
+                        "focused": 0
+                      }
+                    }
+                  ],
+                  "focused": 1
+                },
+                "monocle_container": null,
+                "maximized_window": null,
+                "floating_windows": [],
+                "layout": {
+                  "Default": "BSP"
+                },
+                "layout_rules": [],
+                "layout_flip": null,
+                "workspace_padding": 0,
+                "container_padding": 0,
+                "latest_layout": [
+                  {
+                    "left": 0,
+                    "top": 0,
+                    "right": 1920,
+                    "bottom": 2160
+                  },
+                  {
+                    "left": 1920,
+                    "top": 0,
+                    "right": 1920,
+                    "bottom": 2160
+                  }
+                ],
+                "resize_dimensions": [
+                  {
+                    "left": 0,
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0
+                  },
+                  {
+                    "left": 0,
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0
+                  }
+                ],
+                "tile": true
+              },
+              {
+                "name": "2",
+                "containers": {
+                  "elements": [],
+                  "focused": 0
+                },
+                "monocle_container": null,
+                "maximized_window": null,
+                "floating_windows": [],
+                "layout": {
+                  "Default": "VerticalStack"
+                },
+                "layout_rules": [],
+                "layout_flip": null,
+                "workspace_padding": 0,
+                "container_padding": 0,
+                "latest_layout": [],
+                "resize_dimensions": [],
+                "tile": true
+              },
+              {
+                "name": "III",
+                "containers": {
+                  "elements": [
+                    {
+                      "id": "J6QlCvO-jrdQYGsjF4hXZ",
+                      "windows": {
+                        "elements": [
+                          {
+                            "hwnd": 39195348,
+                            "title": "Main.cs - komoflow - Visual Studio Code",
+                            "exe": "Code.exe",
+                            "class": "Chrome_WidgetWin_1",
+                            "rect": {
+                              "left": 0,
+                              "top": 0,
+                              "right": 3840,
+                              "bottom": 2160
+                            }
+                          }
+                        ],
+                        "focused": 0
+                      }
+                    }
+                  ],
+                  "focused": 0
+                },
+                "monocle_container": null,
+                "maximized_window": null,
+                "floating_windows": [],
+                "layout": {
+                  "Default": "HorizontalStack"
+                },
+                "layout_rules": [],
+                "layout_flip": null,
+                "workspace_padding": 0,
+                "container_padding": 0,
+                "latest_layout": [
+                  {
+                    "left": 0,
+                    "top": 0,
+                    "right": 3840,
+                    "bottom": 2160
+                  }
+                ],
+                "resize_dimensions": [
+                  null
+                ],
+                "tile": true
+              },
+              {
+                "name": "IV",
+                "containers": {
+                  "elements": [],
+                  "focused": 0
+                },
+                "monocle_container": null,
+                "maximized_window": null,
+                "floating_windows": [],
+                "layout": {
+                  "Default": "UltrawideVerticalStack"
+                },
+                "layout_rules": [],
+                "layout_flip": null,
+                "workspace_padding": 0,
+                "container_padding": 0,
+                "latest_layout": [],
+                "resize_dimensions": [],
+                "tile": true
+              },
+              {
+                "name": "V",
+                "containers": {
+                  "elements": [
+                    {
+                      "id": "BA9v6AU6zM7yd8n9QNJWc",
+                      "windows": {
+                        "elements": [
+                          {
+                            "hwnd": 5901010,
+                            "title": "Containers - Docker Desktop",
+                            "exe": "Docker Desktop.exe",
+                            "class": "Chrome_WidgetWin_1",
+                            "rect": {
+                              "left": 0,
+                              "top": 0,
+                              "right": 3840,
+                              "bottom": 2160
+                            }
+                          }
+                        ],
+                        "focused": 0
+                      }
+                    }
+                  ],
+                  "focused": 0
+                },
+                "monocle_container": null,
+                "maximized_window": null,
+                "floating_windows": [],
+                "layout": {
+                  "Default": "Rows"
+                },
+                "layout_rules": [],
+                "layout_flip": null,
+                "workspace_padding": 0,
+                "container_padding": 0,
+                "latest_layout": [
+                  {
+                    "left": 0,
+                    "top": 0,
+                    "right": 3840,
+                    "bottom": 2160
+                  }
+                ],
+                "resize_dimensions": [
+                  null
+                ],
+                "tile": true
+              }
+            ],
+            "focused": 0
+          },
+          "last_focused_workspace": 4,
+          "workspace_names": {}
+        },
+        {
+          "id": 1641253,
+          "name": "DISPLAY12",
+          "device": "XXX0000",
+          "device_id": "XXX0000-5&aa04a24&0&UID4354",
+          "size": {
+            "left": -1920,
+            "top": 313,
+            "right": 1920,
+            "bottom": 1080
+          },
+          "work_area_size": {
+            "left": -1920,
+            "top": 313,
+            "right": 1920,
+            "bottom": 1080
+          },
+          "work_area_offset": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "window_based_work_area_offset": null,
+          "window_based_work_area_offset_limit": 1,
+          "workspaces": {
+            "elements": [
+              {
+                "name": "1",
+                "containers": {
+                  "elements": [
+                    {
+                      "id": "hnjp0t9UH64mCW2DB9-vu",
+                      "windows": {
+                        "elements": [
+                          {
+                            "hwnd": 8261466,
+                            "title": "#komorebi | Komorebi Community Server - Discord",
+                            "exe": "Discord.exe",
+                            "class": "Chrome_WidgetWin_1",
+                            "rect": {
+                              "left": -1920,
+                              "top": 313,
+                              "right": 960,
+                              "bottom": 1080
+                            }
+                          }
+                        ],
+                        "focused": 0
+                      }
+                    },
+                    {
+                      "id": "jv6MzD_0nDOR2THJSe4xh",
+                      "windows": {
+                        "elements": [
+                          {
+                            "hwnd": 463224,
+                            "title": "BastiGHG - Twitch – Ablaze Floorp",
+                            "exe": "floorp.exe",
+                            "class": "MozillaWindowClass",
+                            "rect": {
+                              "left": -960,
+                              "top": 313,
+                              "right": 960,
+                              "bottom": 1080
+                            }
+                          }
+                        ],
+                        "focused": 0
+                      }
+                    }
+                  ],
+                  "focused": 1
+                },
+                "monocle_container": null,
+                "maximized_window": null,
+                "floating_windows": [],
+                "layout": {
+                  "Default": "BSP"
+                },
+                "layout_rules": [],
+                "layout_flip": null,
+                "workspace_padding": 0,
+                "container_padding": 0,
+                "latest_layout": [
+                  {
+                    "left": -1920,
+                    "top": 313,
+                    "right": 960,
+                    "bottom": 1080
+                  },
+                  {
+                    "left": -960,
+                    "top": 313,
+                    "right": 960,
+                    "bottom": 1080
+                  }
+                ],
+                "resize_dimensions": [
+                  null,
+                  null
+                ],
+                "tile": true
+              },
+              {
+                "name": "2",
+                "containers": {
+                  "elements": [],
+                  "focused": 0
+                },
+                "monocle_container": null,
+                "maximized_window": null,
+                "floating_windows": [],
+                "layout": {
+                  "Default": "VerticalStack"
+                },
+                "layout_rules": [],
+                "layout_flip": null,
+                "workspace_padding": 0,
+                "container_padding": 0,
+                "latest_layout": [],
+                "resize_dimensions": [],
+                "tile": true
+              },
+              {
+                "name": "III",
+                "containers": {
+                  "elements": [],
+                  "focused": 0
+                },
+                "monocle_container": null,
+                "maximized_window": null,
+                "floating_windows": [],
+                "layout": {
+                  "Default": "HorizontalStack"
+                },
+                "layout_rules": [],
+                "layout_flip": null,
+                "workspace_padding": 0,
+                "container_padding": 0,
+                "latest_layout": [],
+                "resize_dimensions": [],
+                "tile": true
+              },
+              {
+                "name": "IV",
+                "containers": {
+                  "elements": [
+                    {
+                      "id": "D96LvSf0Q7O89IuRVf5J1",
+                      "windows": {
+                        "elements": [
+                          {
+                            "hwnd": 131928,
+                            "title": "Fan Control V194 (userConfig.json)",
+                            "exe": "FanControl.exe",
+                            "class": "HwndWrapper[FanControl.exe;;2a9c86db-07cf-4520-a320-6f271d7a9b51]",
+                            "rect": {
+                              "left": -1921,
+                              "top": 305,
+                              "right": 1922,
+                              "bottom": 1089
+                            }
+                          }
+                        ],
+                        "focused": 0
+                      }
+                    }
+                  ],
+                  "focused": 0
+                },
+                "monocle_container": null,
+                "maximized_window": null,
+                "floating_windows": [],
+                "layout": {
+                  "Default": "UltrawideVerticalStack"
+                },
+                "layout_rules": [],
+                "layout_flip": null,
+                "workspace_padding": 0,
+                "container_padding": 0,
+                "latest_layout": [
+                  {
+                    "left": -1920,
+                    "top": 313,
+                    "right": 1920,
+                    "bottom": 1080
+                  }
+                ],
+                "resize_dimensions": [
+                  null
+                ],
+                "tile": true
+              },
+              {
+                "name": "V",
+                "containers": {
+                  "elements": [],
+                  "focused": 0
+                },
+                "monocle_container": null,
+                "maximized_window": null,
+                "floating_windows": [],
+                "layout": {
+                  "Default": "Rows"
+                },
+                "layout_rules": [],
+                "layout_flip": null,
+                "workspace_padding": 0,
+                "container_padding": 0,
+                "latest_layout": [],
+                "resize_dimensions": [],
+                "tile": true
+              }
+            ],
+            "focused": 0
+          },
+          "last_focused_workspace": 2,
+          "workspace_names": {}
+        }
+      ],
+      "focused": 0
+    },
+    "is_paused": false,
+    "resize_delta": 50,
+    "new_window_behaviour": "Create",
+    "cross_monitor_move_behaviour": "Insert",
+    "unmanaged_window_operation_behaviour": "Op",
+    "work_area_offset": null,
+    "focus_follows_mouse": null,
+    "mouse_follows_focus": true,
+    "has_pending_raise_op": false
+  }
+  

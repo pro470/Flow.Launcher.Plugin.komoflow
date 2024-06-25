@@ -31,15 +31,9 @@ namespace Flow.Launcher.Plugin.komoflow
                     Console.WriteLine("Waiting for connection.");
                     pipeServer.WaitForConnection();
                     Console.WriteLine("Client connected.");
-
                     using (var sr = new StreamReader(pipeServer))
                     {
-                        string message;
-                        while ((message = sr.ReadLine()) != null)
-                        {
-                            Console.WriteLine("Received: " + message);
-                            // Process the message as needed
-                        }
+                        
                     }
                 }
             });

@@ -35,8 +35,9 @@ def extract_commands_and_arguments(help_output):
 
         # Check for arguments
         if '<' in line and line.startswith('Usage:'):
-            argument_name = re.search(r'<(.*?)>', line).group(1)
-            arguments[current_command].append(argument_name)
+            argument_names = re.findall(r'<(.*?)>', line)
+            for argument_name in argument_names: 
+                arguments[current_command].append(argument_name)
 
 
     return commands, arguments

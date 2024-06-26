@@ -1,13 +1,14 @@
-import flowlauncher.FlowLauncherAPI
-from flowlauncher import FlowLauncher
-import logging
-import win32pipe, win32file
 import json
+import logging
 import time
+import win32file
+import win32pipe
+from flowlauncher import FlowLauncher
+
 from plugin.komorebic_client import WKomorebic
 
-
 BUFFER_SIZE = 1024 * 64
+
 
 class Komoflow(FlowLauncher):
 
@@ -33,18 +34,16 @@ class Komoflow(FlowLauncher):
         self.komorebic.subscribe_pipe(self.pipename)
         logging.info("connect successfully")
 
-
     def exit_komoflow(self) -> None:
         win32pipe.DisconnectNamedPipe(self.pipe)
         win32file.CloseHandle(self.pipe)
 
     def state(self):
 
-
         # read komorebi event
         try:
-            buffer, bytes_to_read, status = win32pipe.PeekNamedPipe(self.pipe, 1);
             while True:
+                buffer, bytes_to_read, status = win32pipe.PeekNamedPipe(self.pipe, 1)
                 if not bytes_to_read:
                     time.sleep(0.1)
                 else:
@@ -65,17 +64,11 @@ class Komoflow(FlowLauncher):
             win32pipe.DisconnectNamedPipe(self.pipe)
             win32file.CloseHandle(self.pipe)
             print("There are exceptions")
+
     def query(self, param: str = '') -> list:
 
-
         return
-
 
     def context_menu(self, data) -> list:
 
-
-
         return
-
-
-

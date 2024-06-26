@@ -68,8 +68,8 @@ class WKomorebic:
     def load_resize(self, PATH):
         subprocess.run(args=[self.path, 'load-resize', PATH], shell=True)
 
-    def display_monitor_workspace(self, MONITOR):
-        subprocess.run(args=[self.path, 'display-monitor-workspace', MONITOR], shell=True)
+    def display_monitor_workspace(self, MONITOR, WORKSPACE):
+        subprocess.run(args=[self.path, 'display-monitor-workspace', MONITOR, WORKSPACE], shell=True)
 
     def focus(self, OPERATION_DIRECTION):
         subprocess.run(args=[self.path, 'focus', OPERATION_DIRECTION], shell=True)
@@ -104,11 +104,11 @@ class WKomorebic:
     def unstack_all(self):
         subprocess.run(args=[self.path, 'unstack-all'], shell=True)
 
-    def resize_edge(self, EDGE):
-        subprocess.run(args=[self.path, 'resize-edge', EDGE], shell=True)
+    def resize_edge(self, EDGE, SIZING):
+        subprocess.run(args=[self.path, 'resize-edge', EDGE, SIZING], shell=True)
 
-    def resize_axis(self, AXIS):
-        subprocess.run(args=[self.path, 'resize-axis', AXIS], shell=True)
+    def resize_axis(self, AXIS, SIZING):
+        subprocess.run(args=[self.path, 'resize-axis', AXIS, SIZING], shell=True)
 
     def unstack(self):
         subprocess.run(args=[self.path, 'unstack'], shell=True)
@@ -146,11 +146,11 @@ class WKomorebic:
     def cycle_send_to_workspace(self, CYCLE_DIRECTION):
         subprocess.run(args=[self.path, 'cycle-send-to-workspace', CYCLE_DIRECTION], shell=True)
 
-    def send_to_monitor_workspace(self, TARGET_MONITOR):
-        subprocess.run(args=[self.path, 'send-to-monitor-workspace', TARGET_MONITOR], shell=True)
+    def send_to_monitor_workspace(self, TARGET_MONITOR, TARGET_WORKSPACE):
+        subprocess.run(args=[self.path, 'send-to-monitor-workspace', TARGET_MONITOR, TARGET_WORKSPACE], shell=True)
 
-    def move_to_monitor_workspace(self, TARGET_MONITOR):
-        subprocess.run(args=[self.path, 'move-to-monitor-workspace', TARGET_MONITOR], shell=True)
+    def move_to_monitor_workspace(self, TARGET_MONITOR, TARGET_WORKSPACE):
+        subprocess.run(args=[self.path, 'move-to-monitor-workspace', TARGET_MONITOR, TARGET_WORKSPACE], shell=True)
 
     def focus_monitor(self, TARGET):
         subprocess.run(args=[self.path, 'focus-monitor', TARGET], shell=True)
@@ -164,8 +164,8 @@ class WKomorebic:
     def focus_workspaces(self, TARGET):
         subprocess.run(args=[self.path, 'focus-workspaces', TARGET], shell=True)
 
-    def focus_monitor_workspace(self, TARGET_MONITOR):
-        subprocess.run(args=[self.path, 'focus-monitor-workspace', TARGET_MONITOR], shell=True)
+    def focus_monitor_workspace(self, TARGET_MONITOR, TARGET_WORKSPACE):
+        subprocess.run(args=[self.path, 'focus-monitor-workspace', TARGET_MONITOR, TARGET_WORKSPACE], shell=True)
 
     def focus_named_workspace(self, WORKSPACE):
         subprocess.run(args=[self.path, 'focus-named-workspace', WORKSPACE], shell=True)
@@ -191,14 +191,14 @@ class WKomorebic:
     def resize_delta(self, PIXELS):
         subprocess.run(args=[self.path, 'resize-delta', PIXELS], shell=True)
 
-    def invisible_borders(self, LEFT):
-        subprocess.run(args=[self.path, 'invisible-borders', LEFT], shell=True)
+    def invisible_borders(self, LEFT, TOP, RIGHT, BOTTOM):
+        subprocess.run(args=[self.path, 'invisible-borders', LEFT, TOP, RIGHT, BOTTOM], shell=True)
 
-    def global_work_area_offset(self, LEFT):
-        subprocess.run(args=[self.path, 'global-work-area-offset', LEFT], shell=True)
+    def global_work_area_offset(self, LEFT, TOP, RIGHT, BOTTOM):
+        subprocess.run(args=[self.path, 'global-work-area-offset', LEFT, TOP, RIGHT, BOTTOM], shell=True)
 
-    def monitor_work_area_offset(self, MONITOR):
-        subprocess.run(args=[self.path, 'monitor-work-area-offset', MONITOR], shell=True)
+    def monitor_work_area_offset(self, MONITOR, LEFT, TOP, RIGHT, BOTTOM):
+        subprocess.run(args=[self.path, 'monitor-work-area-offset', MONITOR, LEFT, TOP, RIGHT, BOTTOM], shell=True)
 
     def focused_workspace_container_padding(self, SIZE):
         subprocess.run(args=[self.path, 'focused-workspace-container-padding', SIZE], shell=True)
@@ -206,11 +206,11 @@ class WKomorebic:
     def focused_workspace_padding(self, SIZE):
         subprocess.run(args=[self.path, 'focused-workspace-padding', SIZE], shell=True)
 
-    def adjust_container_padding(self, SIZING):
-        subprocess.run(args=[self.path, 'adjust-container-padding', SIZING], shell=True)
+    def adjust_container_padding(self, SIZING, ADJUSTMENT):
+        subprocess.run(args=[self.path, 'adjust-container-padding', SIZING, ADJUSTMENT], shell=True)
 
-    def adjust_workspace_padding(self, SIZING):
-        subprocess.run(args=[self.path, 'adjust-workspace-padding', SIZING], shell=True)
+    def adjust_workspace_padding(self, SIZING, ADJUSTMENT):
+        subprocess.run(args=[self.path, 'adjust-workspace-padding', SIZING, ADJUSTMENT], shell=True)
 
     def change_layout(self, DEFAULT_LAYOUT):
         subprocess.run(args=[self.path, 'change-layout', DEFAULT_LAYOUT], shell=True)
@@ -236,68 +236,68 @@ class WKomorebic:
     def retile(self):
         subprocess.run(args=[self.path, 'retile'], shell=True)
 
-    def monitor_index_preference(self, INDEX_PREFERENCE):
-        subprocess.run(args=[self.path, 'monitor-index-preference', INDEX_PREFERENCE], shell=True)
+    def monitor_index_preference(self, INDEX_PREFERENCE, LEFT, TOP, RIGHT, BOTTOM):
+        subprocess.run(args=[self.path, 'monitor-index-preference', INDEX_PREFERENCE, LEFT, TOP, RIGHT, BOTTOM], shell=True)
 
-    def display_index_preference(self, INDEX_PREFERENCE):
-        subprocess.run(args=[self.path, 'display-index-preference', INDEX_PREFERENCE], shell=True)
+    def display_index_preference(self, INDEX_PREFERENCE, DISPLAY):
+        subprocess.run(args=[self.path, 'display-index-preference', INDEX_PREFERENCE, DISPLAY], shell=True)
 
-    def ensure_workspaces(self, MONITOR):
-        subprocess.run(args=[self.path, 'ensure-workspaces', MONITOR], shell=True)
+    def ensure_workspaces(self, MONITOR, WORKSPACE_COUNT):
+        subprocess.run(args=[self.path, 'ensure-workspaces', MONITOR, WORKSPACE_COUNT], shell=True)
 
     def ensure_named_workspaces(self, MONITOR):
         subprocess.run(args=[self.path, 'ensure-named-workspaces', MONITOR], shell=True)
 
-    def container_padding(self, MONITOR):
-        subprocess.run(args=[self.path, 'container-padding', MONITOR], shell=True)
+    def container_padding(self, MONITOR, WORKSPACE, SIZE):
+        subprocess.run(args=[self.path, 'container-padding', MONITOR, WORKSPACE, SIZE], shell=True)
 
-    def named_workspace_container_padding(self, WORKSPACE):
-        subprocess.run(args=[self.path, 'named-workspace-container-padding', WORKSPACE], shell=True)
+    def named_workspace_container_padding(self, WORKSPACE, SIZE):
+        subprocess.run(args=[self.path, 'named-workspace-container-padding', WORKSPACE, SIZE], shell=True)
 
-    def workspace_padding(self, MONITOR):
-        subprocess.run(args=[self.path, 'workspace-padding', MONITOR], shell=True)
+    def workspace_padding(self, MONITOR, WORKSPACE, SIZE):
+        subprocess.run(args=[self.path, 'workspace-padding', MONITOR, WORKSPACE, SIZE], shell=True)
 
-    def named_workspace_padding(self, WORKSPACE):
-        subprocess.run(args=[self.path, 'named-workspace-padding', WORKSPACE], shell=True)
+    def named_workspace_padding(self, WORKSPACE, SIZE):
+        subprocess.run(args=[self.path, 'named-workspace-padding', WORKSPACE, SIZE], shell=True)
 
-    def workspace_layout(self, MONITOR):
-        subprocess.run(args=[self.path, 'workspace-layout', MONITOR], shell=True)
+    def workspace_layout(self, MONITOR, WORKSPACE, VALUE):
+        subprocess.run(args=[self.path, 'workspace-layout', MONITOR, WORKSPACE, VALUE], shell=True)
 
-    def named_workspace_layout(self, WORKSPACE):
-        subprocess.run(args=[self.path, 'named-workspace-layout', WORKSPACE], shell=True)
+    def named_workspace_layout(self, WORKSPACE, VALUE):
+        subprocess.run(args=[self.path, 'named-workspace-layout', WORKSPACE, VALUE], shell=True)
 
-    def workspace_custom_layout(self, MONITOR):
-        subprocess.run(args=[self.path, 'workspace-custom-layout', MONITOR], shell=True)
+    def workspace_custom_layout(self, MONITOR, WORKSPACE, PATH):
+        subprocess.run(args=[self.path, 'workspace-custom-layout', MONITOR, WORKSPACE, PATH], shell=True)
 
-    def named_workspace_custom_layout(self, WORKSPACE):
-        subprocess.run(args=[self.path, 'named-workspace-custom-layout', WORKSPACE], shell=True)
+    def named_workspace_custom_layout(self, WORKSPACE, PATH):
+        subprocess.run(args=[self.path, 'named-workspace-custom-layout', WORKSPACE, PATH], shell=True)
 
-    def workspace_layout_rule(self, MONITOR):
-        subprocess.run(args=[self.path, 'workspace-layout-rule', MONITOR], shell=True)
+    def workspace_layout_rule(self, MONITOR, WORKSPACE, AT_CONTAINER_COUNT, LAYOUT):
+        subprocess.run(args=[self.path, 'workspace-layout-rule', MONITOR, WORKSPACE, AT_CONTAINER_COUNT, LAYOUT], shell=True)
 
-    def named_workspace_layout_rule(self, WORKSPACE):
-        subprocess.run(args=[self.path, 'named-workspace-layout-rule', WORKSPACE], shell=True)
+    def named_workspace_layout_rule(self, WORKSPACE, AT_CONTAINER_COUNT, LAYOUT):
+        subprocess.run(args=[self.path, 'named-workspace-layout-rule', WORKSPACE, AT_CONTAINER_COUNT, LAYOUT], shell=True)
 
-    def workspace_custom_layout_rule(self, MONITOR):
-        subprocess.run(args=[self.path, 'workspace-custom-layout-rule', MONITOR], shell=True)
+    def workspace_custom_layout_rule(self, MONITOR, WORKSPACE, AT_CONTAINER_COUNT, PATH):
+        subprocess.run(args=[self.path, 'workspace-custom-layout-rule', MONITOR, WORKSPACE, AT_CONTAINER_COUNT, PATH], shell=True)
 
-    def named_workspace_custom_layout_rule(self, WORKSPACE):
-        subprocess.run(args=[self.path, 'named-workspace-custom-layout-rule', WORKSPACE], shell=True)
+    def named_workspace_custom_layout_rule(self, WORKSPACE, AT_CONTAINER_COUNT, PATH):
+        subprocess.run(args=[self.path, 'named-workspace-custom-layout-rule', WORKSPACE, AT_CONTAINER_COUNT, PATH], shell=True)
 
-    def clear_workspace_layout_rules(self, MONITOR):
-        subprocess.run(args=[self.path, 'clear-workspace-layout-rules', MONITOR], shell=True)
+    def clear_workspace_layout_rules(self, MONITOR, WORKSPACE):
+        subprocess.run(args=[self.path, 'clear-workspace-layout-rules', MONITOR, WORKSPACE], shell=True)
 
     def clear_named_workspace_layout_rules(self, WORKSPACE):
         subprocess.run(args=[self.path, 'clear-named-workspace-layout-rules', WORKSPACE], shell=True)
 
-    def workspace_tiling(self, MONITOR):
-        subprocess.run(args=[self.path, 'workspace-tiling', MONITOR], shell=True)
+    def workspace_tiling(self, MONITOR, WORKSPACE, VALUE):
+        subprocess.run(args=[self.path, 'workspace-tiling', MONITOR, WORKSPACE, VALUE], shell=True)
 
-    def named_workspace_tiling(self, WORKSPACE):
-        subprocess.run(args=[self.path, 'named-workspace-tiling', WORKSPACE], shell=True)
+    def named_workspace_tiling(self, WORKSPACE, VALUE):
+        subprocess.run(args=[self.path, 'named-workspace-tiling', WORKSPACE, VALUE], shell=True)
 
-    def workspace_name(self, MONITOR):
-        subprocess.run(args=[self.path, 'workspace-name', MONITOR], shell=True)
+    def workspace_name(self, MONITOR, WORKSPACE, VALUE):
+        subprocess.run(args=[self.path, 'workspace-name', MONITOR, WORKSPACE, VALUE], shell=True)
 
     def toggle_window_container_behaviour(self):
         subprocess.run(args=[self.path, 'toggle-window-container-behaviour'], shell=True)
@@ -350,35 +350,35 @@ class WKomorebic:
     def unmanaged_window_operation_behaviour(self, OPERATION_BEHAVIOUR):
         subprocess.run(args=[self.path, 'unmanaged-window-operation-behaviour', OPERATION_BEHAVIOUR], shell=True)
 
-    def float_rule(self, IDENTIFIER):
-        subprocess.run(args=[self.path, 'float-rule', IDENTIFIER], shell=True)
+    def float_rule(self, IDENTIFIER, ID):
+        subprocess.run(args=[self.path, 'float-rule', IDENTIFIER, ID], shell=True)
 
-    def manage_rule(self, IDENTIFIER):
-        subprocess.run(args=[self.path, 'manage-rule', IDENTIFIER], shell=True)
+    def manage_rule(self, IDENTIFIER, ID):
+        subprocess.run(args=[self.path, 'manage-rule', IDENTIFIER, ID], shell=True)
 
-    def initial_workspace_rule(self, IDENTIFIER):
-        subprocess.run(args=[self.path, 'initial-workspace-rule', IDENTIFIER], shell=True)
+    def initial_workspace_rule(self, IDENTIFIER, ID, MONITOR, WORKSPACE):
+        subprocess.run(args=[self.path, 'initial-workspace-rule', IDENTIFIER, ID, MONITOR, WORKSPACE], shell=True)
 
-    def initial_named_workspace_rule(self, IDENTIFIER):
-        subprocess.run(args=[self.path, 'initial-named-workspace-rule', IDENTIFIER], shell=True)
+    def initial_named_workspace_rule(self, IDENTIFIER, ID, WORKSPACE):
+        subprocess.run(args=[self.path, 'initial-named-workspace-rule', IDENTIFIER, ID, WORKSPACE], shell=True)
 
-    def workspace_rule(self, IDENTIFIER):
-        subprocess.run(args=[self.path, 'workspace-rule', IDENTIFIER], shell=True)
+    def workspace_rule(self, IDENTIFIER, ID, MONITOR, WORKSPACE):
+        subprocess.run(args=[self.path, 'workspace-rule', IDENTIFIER, ID, MONITOR, WORKSPACE], shell=True)
 
-    def named_workspace_rule(self, IDENTIFIER):
-        subprocess.run(args=[self.path, 'named-workspace-rule', IDENTIFIER], shell=True)
+    def named_workspace_rule(self, IDENTIFIER, ID, WORKSPACE):
+        subprocess.run(args=[self.path, 'named-workspace-rule', IDENTIFIER, ID, WORKSPACE], shell=True)
 
-    def identify_object_name_change_application(self, IDENTIFIER):
-        subprocess.run(args=[self.path, 'identify-object-name-change-application', IDENTIFIER], shell=True)
+    def identify_object_name_change_application(self, IDENTIFIER, ID):
+        subprocess.run(args=[self.path, 'identify-object-name-change-application', IDENTIFIER, ID], shell=True)
 
-    def identify_tray_application(self, IDENTIFIER):
-        subprocess.run(args=[self.path, 'identify-tray-application', IDENTIFIER], shell=True)
+    def identify_tray_application(self, IDENTIFIER, ID):
+        subprocess.run(args=[self.path, 'identify-tray-application', IDENTIFIER, ID], shell=True)
 
-    def identify_layered_application(self, IDENTIFIER):
-        subprocess.run(args=[self.path, 'identify-layered-application', IDENTIFIER], shell=True)
+    def identify_layered_application(self, IDENTIFIER, ID):
+        subprocess.run(args=[self.path, 'identify-layered-application', IDENTIFIER, ID], shell=True)
 
-    def remove_title_bar(self, IDENTIFIER):
-        subprocess.run(args=[self.path, 'remove-title-bar', IDENTIFIER], shell=True)
+    def remove_title_bar(self, IDENTIFIER, ID):
+        subprocess.run(args=[self.path, 'remove-title-bar', IDENTIFIER, ID], shell=True)
 
     def toggle_title_bars(self):
         subprocess.run(args=[self.path, 'toggle-title-bars'], shell=True)
@@ -386,8 +386,8 @@ class WKomorebic:
     def border(self, BOOLEAN_STATE):
         subprocess.run(args=[self.path, 'border', BOOLEAN_STATE], shell=True)
 
-    def border_colour(self, R):
-        subprocess.run(args=[self.path, 'border-colour', R], shell=True)
+    def border_colour(self, R, G, B):
+        subprocess.run(args=[self.path, 'border-colour', R, G, B], shell=True)
 
     def border_width(self, WIDTH):
         subprocess.run(args=[self.path, 'border-width', WIDTH], shell=True)

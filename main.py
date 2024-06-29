@@ -6,7 +6,8 @@ sys.path.append(parent_folder_path)
 sys.path.append(os.path.join(parent_folder_path, 'lib'))
 sys.path.append(os.path.join(parent_folder_path, 'plugin'))
 
-from plugin.komoflow import Komoflow
+from plugin import komoflow, utils
 
 if __name__ == "__main__":
-    Komoflow()
+    utils.connect_komorebi(komoflow.plugin.komorebic, komoflow.plugin.pipename)
+    komoflow.plugin.run()

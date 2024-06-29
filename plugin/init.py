@@ -1,2 +1,3 @@
 from komorebic_client import WKomorebic
-from komoflow import Komoflow
+from methods import *
+from utils import *

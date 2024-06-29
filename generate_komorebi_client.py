@@ -22,22 +22,28 @@ def extract_commands_and_arguments(help_output):
     commands = []
     current_command = None
     arguments = {}
+    options = {}
 
 
     for line in lines:
         line = line.strip()
+        print(f''' '{line}' ''')
 
         # Check for command line
         if line.startswith('Usage:'):
             current_command = line.split()[2]
             commands.append(current_command)
             arguments[current_command] = []
+            options[current_command] = []
 
         # Check for arguments
         if '<' in line and line.startswith('Usage:'):
             argument_names = re.findall(r'<(.*?)>', line)
             for argument_name in argument_names: 
                 arguments[current_command].append(argument_name)
+
+
+
 
 
     return commands, arguments

@@ -9,7 +9,7 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       python_ver: 3.11
 
@@ -30,12 +30,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r ./requirements.txt -t ./lib
-          zip -r Flow.Launcher.Plugin.HelloWorldPython.zip . -x '*.git*'
+          zip -r Flow.Launcher.Plugin.komoflow.zip . -x '*.git*'
       - name: Publish
         if: success()
         uses: softprops/action-gh-release@v1
         with:
-          files: 'Flow.Launcher.Plugin.HelloWorldPython.zip'
+          files: 'Flow.Launcher.Plugin.komoflow.zip'
           tag_name: "v${{steps.version.outputs.prop}}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -12,6 +12,9 @@ class Query(Method):
     def __call__(self, query: str) -> ResultResponse:
         return self.return_results()
 
+    def application_focus(self, hwnd: int, exe: str):
+        return
+
 
 class Context_menu(Method):
 

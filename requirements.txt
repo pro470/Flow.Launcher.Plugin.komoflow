@@ -1,2 +1,2 @@
 pyflowlauncher[all]
-pywin32
+pywin32==306

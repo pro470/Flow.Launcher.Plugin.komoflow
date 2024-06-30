@@ -1,6 +1,6 @@
 from pyflowlauncher import Method, ResultResponse, Result
 from plugin.komorebic_client import WKomorebic
-from plugin.utils import *
+from utils import state
 
 
 class Query(Method):

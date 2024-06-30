@@ -30,7 +30,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r ./requirements.txt -t ./lib
-          scoop install 7zip
           7z a -tzip Flow.Launcher.Plugin.komoflow.zip . -xr!*.git*
       - name: Publish
         if: success()

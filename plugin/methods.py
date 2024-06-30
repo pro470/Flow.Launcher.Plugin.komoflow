@@ -13,8 +13,6 @@ class Query(Method):
         return self.return_results()
 
     def application_focus(self, hwnd: int, exe: str):
-
-        
         return
 
 

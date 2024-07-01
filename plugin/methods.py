@@ -58,6 +58,9 @@ class App_focus(Method):
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename
+        self._logger = shared.logger(self)
+        self._results: list[Result] = []
+
 
     def __call__(self, exe: str, hwnd: int):
         self.komorebic.focus_exe(exe=exe, hwnd=str(hwnd))

@@ -1,6 +1,6 @@
 from pyflowlauncher import Plugin
 from komorebic_client import WKomorebic
-from methods import Query,Context_menu,App_focus
+from methods import Query, Context_menu, App_focus
 from utils import create_named_pipe
 
 plugin = Plugin()

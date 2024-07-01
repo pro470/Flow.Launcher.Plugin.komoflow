@@ -14,25 +14,25 @@ class WKomorebic:
     def start(self, ffm: bool = False, config: Optional[Iterable[Any]] = None, sawait: bool = False, tcp: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False):
         cmd = [self.path, 'start']
         if ffm: 
-            cmd.extend('--ffm')
+            cmd.extend(['--ffm'])
         if config:
-            cmd.extend('--config')
+            cmd.extend(['--config'])
             cmd.extend(config)
         if sawait: 
-            cmd.extend('--sawait')
+            cmd.extend(['--sawait'])
         if tcp:
-            cmd.extend('--tcp')
+            cmd.extend(['--tcp'])
             cmd.extend(tcp)
         if whkd: 
-            cmd.extend('--whkd')
+            cmd.extend(['--whkd'])
         if ahk: 
-            cmd.extend('--ahk')
+            cmd.extend(['--ahk'])
         subprocess.run(args=cmd, shell=True)
 
     def stop(self, whkd: bool = False):
         cmd = [self.path, 'stop']
         if whkd: 
-            cmd.extend('--whkd')
+            cmd.extend(['--whkd'])
         subprocess.run(args=cmd, shell=True)
 
     def check(self):
@@ -118,10 +118,10 @@ class WKomorebic:
     def focus_exe(self, exe: Optional[Iterable[Any]] = None, hwnd: Optional[Iterable[Any]] = None):
         cmd = [self.path, 'focus-exe']
         if exe:
-            cmd.extend('--exe')
+            cmd.extend(['--exe'])
             cmd.extend(exe)
         if hwnd:
-            cmd.extend('--hwnd')
+            cmd.extend(['--hwnd'])
             cmd.extend(hwnd)
         subprocess.run(args=cmd, shell=True)
 
@@ -540,7 +540,7 @@ class WKomorebic:
     def border_colour(self, R, G, B, window: Optional[Iterable[Any]] = None):
         cmd = [self.path, 'border-colour', R, G, B]
         if window:
-            cmd.extend('--window')
+            cmd.extend(['--window'])
             cmd.extend(window)
         subprocess.run(args=cmd, shell=True)
 
@@ -571,14 +571,14 @@ class WKomorebic:
     def focus_follows_mouse(self, BOOLEAN_STATE, implementation: Optional[Iterable[Any]] = None):
         cmd = [self.path, 'focus-follows-mouse', BOOLEAN_STATE]
         if implementation:
-            cmd.extend('--implementation')
+            cmd.extend(['--implementation'])
             cmd.extend(implementation)
         subprocess.run(args=cmd, shell=True)
 
     def toggle_focus_follows_mouse(self, implementation: Optional[Iterable[Any]] = None):
         cmd = [self.path, 'toggle-focus-follows-mouse']
         if implementation:
-            cmd.extend('--implementation')
+            cmd.extend(['--implementation'])
             cmd.extend(implementation)
         subprocess.run(args=cmd, shell=True)
 
@@ -629,14 +629,14 @@ class WKomorebic:
     def enable_autostart(self, config: Optional[Iterable[Any]] = None, ffm: bool = False, whkd: bool = False, ahk: bool = False):
         cmd = [self.path, 'enable-autostart']
         if config:
-            cmd.extend('--config')
+            cmd.extend(['--config'])
             cmd.extend(config)
         if ffm: 
-            cmd.extend('--ffm')
+            cmd.extend(['--ffm'])
         if whkd: 
-            cmd.extend('--whkd')
+            cmd.extend(['--whkd'])
         if ahk: 
-            cmd.extend('--ahk')
+            cmd.extend(['--ahk'])
         subprocess.run(args=cmd, shell=True)
 
     def disable_autostart(self):

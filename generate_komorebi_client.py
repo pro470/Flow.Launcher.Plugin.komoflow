@@ -82,13 +82,13 @@ class WKomorebic:
                     for _ in option_arguments:
                         option_parameter.append(f"{option_names[0]}: Optional[Iterable[Any]] = None")
                         option_if.append(f'''if {option_names[0]}:
-            cmd.extend('--{option_names[0]}')
+            cmd.extend(['--{option_names[0]}'])
             cmd.extend({option_names[0]})''')
                 else:
                     if option_names[0] != 'help':
                         option_parameter.append(f"{option_names[0]}: bool = False")
                         option_if.append(f'''if {option_names[0]}: 
-            cmd.extend('--{option_names[0]}')''')
+            cmd.extend(['--{option_names[0]}'])''')
 
             print(option_parameter)
             rr = ', ' + ', '.join(option_parameter) if option_parameter else ''

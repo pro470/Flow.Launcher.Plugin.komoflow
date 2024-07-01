@@ -1,1 +1,1 @@
-pyflowlauncher[all]==0.9.2
+pyflowlauncher[all]

@@ -5,7 +5,7 @@ from utils import state
 
 class Query(Method):
 
-    def __init__(self, komorebic, pipe, pipename):
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename
@@ -16,8 +16,7 @@ class Query(Method):
         state_json = state(self.pipe)
         if not state_json['is_paused']:
             self.application_focus(state_json)
-        if query != '':
-            self._results = utils.score_results(query, self._results)
+        self._results = utils.score_results(query, self._results, match_on_empty_query=True)
         return self.return_results()
 
     def application_focus(self, state):
@@ -41,7 +40,7 @@ class Query(Method):
 
 class Context_menu(Method):
 
-    def __init__(self, komorebic, pipe, pipename):
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename

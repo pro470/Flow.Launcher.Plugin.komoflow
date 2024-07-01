@@ -53,7 +53,8 @@ def connect_komorebi(wkomorebic, pipename) -> None:
     wkomorebic.subscribe_pipe(pipename)
 
 
-def exit_komoflow(pipe) -> None:
+def exit_komoflow(wkomorebic, pipe, pipename) -> None:
+    wkomorebic.unsubscribe_pipe(pipename)
     DisconnectNamedPipe(pipe)
     CloseHandle(pipe)
 

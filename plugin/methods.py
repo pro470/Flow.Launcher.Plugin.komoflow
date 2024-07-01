@@ -1,4 +1,4 @@
-from pyflowlauncher import Method, ResultResponse, Result
+from pyflowlauncher import Method, ResultResponse, Result, shared
 from plugin.komorebic_client import WKomorebic
 from utils import state
 
@@ -9,6 +9,8 @@ class Query(Method):
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename
+        self._logger = shared.logger(self)
+        self._results: list[Result] = []
 
     def __call__(self, query: str) -> ResultResponse:
         state_json = state(self.pipe)
@@ -27,8 +29,8 @@ class Query(Method):
                     for window in container['windows']['elements']:
                         application_list.append([window['exe'], window['hwnd'], window['title']])
                         r = Result(
-                            Title=window['title'],
-                            SubTitle=f'''Exe: {window['exe']}, HWND: {window['hwnd']}'''
+                            Title=str(window['title']),
+                            SubTitle=f"Exe: {str(window['exe'])}, HWND: {str(window['hwnd'])}"
                         )
 
                         self.add_result(r)
@@ -40,6 +42,8 @@ class Context_menu(Method):
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename
+        self._logger = shared.logger(self)
+        self._results: list[Result] = []
 
     def __call__(self, data) -> ResultResponse:
         return self.return_results()

@@ -4,6 +4,9 @@ import time
 import os
 import ctypes
 import ctypes.wintypes
+from pyflowlauncher import Result, string_matcher
+from typing import Iterable, Generator
+
 
 # Constants
 PIPE_ACCESS_DUPLEX = 0x00000003
@@ -86,3 +89,24 @@ def state(pipe):
         DisconnectNamedPipe(pipe)
         CloseHandle(pipe)
 
+def score_resluts_with_sub(query: str, results: Iterable[Result]) -> Generator[Result, None, None]:
+    for result in results:
+        match = string_matcher.string_matcher(
+            query,
+            result.Title,
+            query_search_precision=string_matcher.DEFAULT_QUERY_SEARCH_PRECISION
+        )
+        if match.matched or (True and not query):
+            result.TitleHighlightData = match.index_list
+            result.Score = match.score
+            yield result
+
+        if result.Score == 0:
+            match = string_matcher.string_matcher(
+                query,
+                result.SubTitle,
+                query_search_precision=string_matcher.REGULAR_SEARCH_PRECISION
+            )
+            if match.matched or (True and not query):
+                result.Score = match.score
+                yield result

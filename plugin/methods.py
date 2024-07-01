@@ -1,6 +1,6 @@
 from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils, icons
 from plugin.komorebic_client import WKomorebic
-from utils import state
+from utils import state, score_resluts_with_sub
 
 
 class Query(Method):
@@ -16,7 +16,7 @@ class Query(Method):
         state_json = state(self.pipe)
         if not state_json['is_paused']:
             self.application_focus(state_json)
-        self._results = utils.score_results(query, self._results, match_on_empty_query=True)
+        self._results = score_resluts_with_sub(query, self._results)
         return self.return_results()
 
     def application_focus(self, state):

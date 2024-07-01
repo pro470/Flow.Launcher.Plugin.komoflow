@@ -61,6 +61,5 @@ class App_focus(Method):
         self._logger = shared.logger(self)
         self._results: list[Result] = []
 
-
     def __call__(self, exe: str, hwnd: int):
-        self.komorebic.focus_exe(exe=exe, hwnd=str(hwnd))
+        self.komorebic.focus_exe(exe=[exe], hwnd=[str(hwnd)])

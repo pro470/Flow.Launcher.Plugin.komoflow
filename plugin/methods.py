@@ -1,4 +1,4 @@
-from pyflowlauncher import Method, ResultResponse, Result, shared
+from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction
 from plugin.komorebic_client import WKomorebic
 from utils import state
 
@@ -30,7 +30,10 @@ class Query(Method):
                         application_list.append([window['exe'], window['hwnd'], window['title']])
                         r = Result(
                             Title=str(window['title']),
-                            SubTitle=f"Exe: {str(window['exe'])}, HWND: {str(window['hwnd'])}"
+                            SubTitle=f"Exe: {str(window['exe'])}, HWND: {str(window['hwnd'])}",
+                            JsonRPCAction=JsonRPCAction(method="App_focus",
+                                                        parameters=[str(window['exe']), int(window['hwnd'])]),
+
                         )
 
                         self.add_result(r)
@@ -56,5 +59,5 @@ class App_focus(Method):
         self.pipe = pipe
         self.pipename = pipename
 
-    def __call__(self, hwnd, exe):
-        self.komorebic.focus_exe()
+    def __call__(self, exe: str, hwnd: int):
+        self.komorebic.focus_exe(exe=exe, hwnd=str(hwnd))

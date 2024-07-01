@@ -1,4 +1,4 @@
-from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils
+from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils, icons
 from plugin.komorebic_client import WKomorebic
 from utils import state
 
@@ -21,7 +21,6 @@ class Query(Method):
         return self.return_results()
 
     def application_focus(self, state):
-
         application_list = []
 
         for monitor in state['monitors']['elements']:

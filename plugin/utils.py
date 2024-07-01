@@ -107,6 +107,6 @@ def score_resluts_with_sub(query: str, results: Iterable[Result]) -> Generator[R
                 result.SubTitle,
                 query_search_precision=string_matcher.REGULAR_SEARCH_PRECISION
             )
-            if match.matched or (True and not query):
+            if match.matched or (False and not query):
                 result.Score = match.score
                 yield result

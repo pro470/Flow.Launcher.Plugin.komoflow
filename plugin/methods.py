@@ -16,7 +16,8 @@ class Query(Method):
         state_json = state(self.pipe)
         if not state_json['is_paused']:
             self.application_focus(state_json)
-        self._results = utils.score_results(query, self._results)
+        if query != '':
+            self._results = utils.score_results(query, self._results)
         return self.return_results()
 
     def application_focus(self, state):

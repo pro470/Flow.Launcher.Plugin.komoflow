@@ -5,8 +5,6 @@ import os
 import ctypes
 import ctypes.wintypes
 
-import pyflowlauncher.shared
-
 # Constants
 PIPE_ACCESS_DUPLEX = 0x00000003
 PIPE_TYPE_MESSAGE = 0x00000004
@@ -19,16 +17,19 @@ GENERIC_WRITE = 0x40000000
 OPEN_EXISTING = 3
 
 # Functions from kernel32.dll
-CreateNamedPipe = ctypes.windll.kernel32.CreateNamedPipeW
-ConnectNamedPipe = ctypes.windll.kernel32.ConnectNamedPipe
-ReadFile = ctypes.windll.kernel32.ReadFile
-WriteFile = ctypes.windll.kernel32.WriteFile
-CloseHandle = ctypes.windll.kernel32.CloseHandle
-CreateFile = ctypes.windll.kernel32.CreateFileW
-DisconnectNamedPipe = ctypes.windll.kernel32.DisconnectNamedPipe
+CreateNamedPipe = ctypes.WinDLL('kernel32', use_last_error=True).CreateNamedPipeW
+ConnectNamedPipe = ctypes.WinDLL('kernel32', use_last_error=True).ConnectNamedPipe
+ReadFile = ctypes.WinDLL('kernel32', use_last_error=True).ReadFile
+WriteFile = ctypes.WinDLL('kernel32', use_last_error=True).WriteFile
+CloseHandle = ctypes.WinDLL('kernel32', use_last_error=True).CloseHandle
+CreateFile = ctypes.WinDLL('kernel32', use_last_error=True).CreateFileW
+DisconnectNamedPipe = ctypes.WinDLL('kernel32', use_last_error=True).DisconnectNamedPipe
+
+
 
 # Error handling
-GetLastError = ctypes.windll.kernel32.GetLastError
+GetLastError = ctypes.WinDLL('kernel32', use_last_error=True).GetLastError
+
 
 BUFFER_SIZE = 1024 * 64
 
@@ -83,3 +84,4 @@ def state(pipe):
     except (BaseException, Exception):
         DisconnectNamedPipe(pipe)
         CloseHandle(pipe)
+

@@ -85,8 +85,7 @@ def state(pipe):
         CloseHandle(pipe)
 
 
-def score_resluts_with_sub(query: str, results: Iterable[Result]) -> Generator[
-    Result, None, None]:
+def score_resluts_with_sub(query: str, results: Iterable[Result]) -> Generator[Result, None, None]:
     for result in results:
         match = string_matcher.string_matcher(
             query,

@@ -15,18 +15,16 @@ class Query(Method):
     def __call__(self, query: str) -> ResultResponse:
         state_json = state(self.pipe)
         if not state_json['is_paused']:
-            self.application_focus(state_json)
-        self._results = score_resluts_with_sub(query, self._results)
+            self.application_focus(state_json, query)
         return self.return_results()
 
-    def application_focus(self, state):
+    def application_focus(self, state, query):
         application_list = []
 
         for monitor in state['monitors']['elements']:
             for workspace in monitor['workspaces']['elements']:
                 for container in workspace['containers']['elements']:
                     for window in container['windows']['elements']:
-                        application_list.append([window['exe'], window['hwnd'], window['title']])
                         r = Result(
                             Title=str(window['title']),
                             SubTitle=f"EXE: {str(window['exe'])}, HWND: {str(window['hwnd'])}",
@@ -34,8 +32,13 @@ class Query(Method):
                                                         parameters=[str(window['exe']), int(window['hwnd'])]),
 
                         )
+                        application_list.append(r)
 
-                        self.add_result(r)
+        scored_results = score_resluts_with_sub(query, application_list)
+
+        for scored_result in scored_results:
+
+            self.add_result(scored_result)
 
 
 class Context_menu(Method):

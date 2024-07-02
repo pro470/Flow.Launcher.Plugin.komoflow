@@ -7,7 +7,7 @@ def run_help_command(command):
     return result.stdout
 
 
-def extract_commands(help_output):
+def extract_commands(help_output) -> list:
     lines = help_output.splitlines()
     commands = []
     for line in lines:
@@ -72,11 +72,8 @@ class WKomorebic:
             options_lists = options[command][command]
             option_parameter = []
             option_if = []
-            print(f"{options_lists}")
             for option_dict in options_lists:
                 option_names = list(option_dict.keys())
-                print(f"{option_names[0]}")
-                print(f"{option_dict[option_names[0]]}")
                 option_arguments = option_dict[option_names[0]]
                 if option_arguments:
                     for _ in option_arguments:
@@ -90,7 +87,6 @@ class WKomorebic:
                         option_if.append(f'''if {option_names[0]}: 
             cmd.extend(['--{option_names[0]}'])''')
 
-            print(option_parameter)
             rr = ', ' + ', '.join(option_parameter) if option_parameter else ''
             ff = '\n        '.join(option_if) + '\n        ' if option_if else ''
             script_content += f'''    def {method_name}(self{method_arguments}{rr}):

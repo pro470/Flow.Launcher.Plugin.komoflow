@@ -111,3 +111,10 @@ def score_resluts_with_sub(query: str, results: Iterable[Result]) -> Generator[R
             if match.matched or (False and not query):
                 result.Score = match.score
                 yield result
+
+
+def get_first_word(s: str):
+    words = s.split()
+    if words:
+        return words[0]
+    return None

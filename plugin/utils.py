@@ -100,8 +100,9 @@ def score_resluts_with_sub(query: str, results: Iterable[Result]) -> Generator[
 
         if result.Score == 0:
             text = result.SubTitle
-            text.replace('EXE', '')
-            text.replace('HWND', '')
+            text.replace('EXE:', '')
+            text.replace('HWND:', '')
+            text.replace('.exe', '')
 
             match = string_matcher.string_matcher(
                 query,

@@ -25,8 +25,9 @@ class Query(Method):
     def call_methods(self, query: str, state_j):
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
-            if callable(attr) and (not attr_name.startswith('__') and not attr_name.endswith('__')) and (not 'add_function' in attr_name or not 'add_function' in attr_name or not 'run_function' in attr_name or not 'call_methods' in attr_name or not 'add_result' in attr_name or not 'call' in attr_name or not 'init' in attr_name or not 'return_results'):
-                attr(query, state_j)  # Call the method
+            if callable(attr) and not attr_name.startswith('__') and not attr_name.endswith('__'):
+                if attr_name != 'add_function' and 'add_function' != attr_name and 'run_function' != attr_name and 'call_methods' != attr_name and 'add_result' != attr_name and 'return_results' != attr_name:
+                    attr(query, state_j)  # Call the method
 
     def add_function(self, key, function):
         """Adds a function to the dictionary with the given key."""

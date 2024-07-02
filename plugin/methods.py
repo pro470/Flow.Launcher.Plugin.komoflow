@@ -26,14 +26,14 @@ class Query(Method):
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
             if callable(attr) and (attr_name.startswith('__') and attr_name.endswith('__')) and (
-                    not attr_name == 'add_function'
-                    or not attr_name == 'add_function'
-                    or not attr_name == 'run_function'
-                    or not attr_name == 'call_methods'
-                    or not attr_name == 'add_result'
-                    or not attr_name == '__call__'
-                    or not attr_name == '__init__'
-                    or not attr_name == 'return_results'):
+                    not 'add_function' in attr_name
+                    or not 'add_function' in attr_name
+                    or not 'run_function' in attr_name
+                    or not 'call_methods' in attr_name
+                    or not 'add_result' in attr_name
+                    or not '__call__' in attr_name
+                    or not '__init__' in attr_name
+                    or not 'return_results'):
                 print(f"Calling {attr_name}")
                 attr(query, state_j)  # Call the method
 

@@ -38,7 +38,7 @@ class Query(Method):
         if key in self.functions_dict:
             self.functions_dict[key](query, state_j)
 
-    def application_focus(self, state_j, query):
+    def application_focus(self, query, stat_j):
         application_list = []
 
         for monitor in state_j['monitors']['elements']:

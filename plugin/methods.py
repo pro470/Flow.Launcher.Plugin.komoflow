@@ -34,7 +34,6 @@ class Query(Method):
                     or not '__call__' in attr_name
                     or not '__init__' in attr_name
                     or not 'return_results'):
-                print(f"Calling {attr_name}")
                 attr(query, state_j)  # Call the method
 
     def add_function(self, key, function):

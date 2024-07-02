@@ -12,6 +12,11 @@ class Query(Method):
         self._logger = shared.logger(self)
         self._results: list[Result] = []
         self.functions_dict = {}
+        for attr_name in dir(self):
+            attr = getattr(self, attr_name)
+            if callable(attr) and not attr_name.startswith('__') and not attr_name.endswith('__'):
+                if attr_name != 'application_focus' and attr_name != 'add_function' and 'add_function' != attr_name and 'run_function' != attr_name and 'call_methods' != attr_name and 'add_result' != attr_name and 'return_results' != attr_name:
+                    self.functions_dict[attr_name.replace('_', '-')] = attr
 
     def __call__(self, query: str) -> ResultResponse:
         state_json = state(self.pipe)

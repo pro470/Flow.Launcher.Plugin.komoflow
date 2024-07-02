@@ -29,7 +29,7 @@ class Query(Method):
                         application_list.append([window['exe'], window['hwnd'], window['title']])
                         r = Result(
                             Title=str(window['title']),
-                            SubTitle=f"Exe: {str(window['exe'])}, HWND: {str(window['hwnd'])}",
+                            SubTitle=f"EXE: {str(window['exe'])}, HWND: {str(window['hwnd'])}",
                             JsonRPCAction=JsonRPCAction(method="app_focus",
                                                         parameters=[str(window['exe']), int(window['hwnd'])]),
 

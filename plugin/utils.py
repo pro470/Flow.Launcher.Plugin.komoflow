@@ -5,8 +5,7 @@ import os
 import ctypes
 import ctypes.wintypes
 from pyflowlauncher import Result, string_matcher
-from typing import Iterable, Generator
-
+from typing import Iterable, Generator, Optional
 
 # Constants
 PIPE_ACCESS_DUPLEX = 0x00000003
@@ -28,11 +27,8 @@ CloseHandle = ctypes.WinDLL('kernel32', use_last_error=True).CloseHandle
 CreateFile = ctypes.WinDLL('kernel32', use_last_error=True).CreateFileW
 DisconnectNamedPipe = ctypes.WinDLL('kernel32', use_last_error=True).DisconnectNamedPipe
 
-
-
 # Error handling
 GetLastError = ctypes.WinDLL('kernel32', use_last_error=True).GetLastError
-
 
 BUFFER_SIZE = 1024 * 64
 
@@ -47,7 +43,6 @@ def create_named_pipe(pipename):
 
     if pipe == INVALID_HANDLE_VALUE:
         raise ctypes.WinError(ctypes.get_last_error())
-
 
     return pipe
 
@@ -89,7 +84,9 @@ def state(pipe):
         DisconnectNamedPipe(pipe)
         CloseHandle(pipe)
 
-def score_resluts_with_sub(query: str, results: Iterable[Result]) -> Generator[Result, None, None]:
+
+def score_resluts_with_sub(query: str, results: Iterable[Result]) -> Generator[
+    Result, None, None]:
     for result in results:
         match = string_matcher.string_matcher(
             query,
@@ -102,9 +99,13 @@ def score_resluts_with_sub(query: str, results: Iterable[Result]) -> Generator[R
             yield result
 
         if result.Score == 0:
+            text = result.SubTitle
+            text.replace('EXE', '')
+            text.replace('HWND', '')
+
             match = string_matcher.string_matcher(
                 query,
-                result.SubTitle,
+                text,
                 query_search_precision=string_matcher.REGULAR_SEARCH_PRECISION
             )
             if match.matched or (False and not query):

@@ -96,7 +96,7 @@ class Query(Method):
             result_ffm = Result(Title='ffm',
                                 SubTitle="Allow the use of komorebi's custom focus-follows-mouse implementation",
                                 AutoCompleteText="ffm",
-                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ffm"], dont_hide_after_action=True))
+                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ffm"], dontHideAfterAction=True))
 
             if 'ffm' in query:
                 ffm = True

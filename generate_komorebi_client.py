@@ -43,10 +43,11 @@ def extract_commands_and_arguments(help_output):
                 arguments[current_command].append(argument_name)
 
         if '--' in line:
-            option_name = re.search(r'--(\w+)', line).group(1)
+            option_name = re.search(r'--([\w-]+)', line).group(1)
+            option_name = option_name.replace("-", "_")
             option_arguments = re.findall(r'<(.*?)>', line)
             if option_name == 'await':
-                options[current_command].append({'sawait': option_arguments})
+                options[current_command].append({'await-configuration': option_arguments})
             else:
                 options[current_command].append({option_name: option_arguments})
 
@@ -79,13 +80,13 @@ class WKomorebic:
                     for _ in option_arguments:
                         option_parameter.append(f"{option_names[0]}: Optional[Iterable[Any]] = None")
                         option_if.append(f'''if {option_names[0]}:
-            cmd.extend(['--{option_names[0]}'])
+            cmd.extend(['--{option_names[0].replace("_", "-")}'])
             cmd.extend({option_names[0]})''')
                 else:
                     if option_names[0] != 'help':
                         option_parameter.append(f"{option_names[0]}: bool = False")
                         option_if.append(f'''if {option_names[0]}: 
-            cmd.extend(['--{option_names[0]}'])''')
+            cmd.extend(['--{option_names[0].replace("_", "-")}'])''')
 
             rr = ', ' + ', '.join(option_parameter) if option_parameter else ''
             ff = '\n        '.join(option_if) + '\n        ' if option_if else ''

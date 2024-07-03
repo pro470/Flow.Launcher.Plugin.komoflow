@@ -11,18 +11,18 @@ class WKomorebic:
         cmd = [self.path, 'quickstart']
         subprocess.run(args=cmd, shell=True)
 
-    def start(self, ffm: bool = False, config: Optional[Iterable[Any]] = None, sawait: bool = False, tcp: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False):
+    def start(self, ffm: bool = False, config: Optional[Iterable[Any]] = None, await_configuration: bool = False, tcp_port: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False):
         cmd = [self.path, 'start']
         if ffm: 
             cmd.extend(['--ffm'])
         if config:
             cmd.extend(['--config'])
             cmd.extend(config)
-        if sawait: 
-            cmd.extend(['--sawait'])
-        if tcp:
-            cmd.extend(['--tcp'])
-            cmd.extend(tcp)
+        if await_configuration: 
+            cmd.extend(['--await-configuration'])
+        if tcp_port:
+            cmd.extend(['--tcp-port'])
+            cmd.extend(tcp_port)
         if whkd: 
             cmd.extend(['--whkd'])
         if ahk: 
@@ -537,11 +537,11 @@ class WKomorebic:
         cmd = [self.path, 'border', BOOLEAN_STATE]
         subprocess.run(args=cmd, shell=True)
 
-    def border_colour(self, R, G, B, window: Optional[Iterable[Any]] = None):
+    def border_colour(self, R, G, B, window_kind: Optional[Iterable[Any]] = None):
         cmd = [self.path, 'border-colour', R, G, B]
-        if window:
-            cmd.extend(['--window'])
-            cmd.extend(window)
+        if window_kind:
+            cmd.extend(['--window-kind'])
+            cmd.extend(window_kind)
         subprocess.run(args=cmd, shell=True)
 
     def border_width(self, WIDTH):

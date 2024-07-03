@@ -89,7 +89,7 @@ class Query(Method):
             new_query = query.replace('start', '')
             ffm: bool = False
             config: Optional[Iterable[Any]] = None
-            sawait: bool = False
+            await_configuration: bool = False
             tcp: Optional[Iterable[Any]] = None
             whkd: bool = False
             ahk: bool = False
@@ -104,9 +104,21 @@ class Query(Method):
             else:
                 start_list.append(result_ffm)
 
+            result_await_configuration = Result(Title='await-configuration',
+                                                SubTitle="Wait for 'komorebic complete-configuration' to be sent before processing events",
+                                                AutoCompleteText="ffm",
+                                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "await"],
+                                                                            dontHideAfterAction=True))
+
+            if 'await-configuration' in query:
+                await_configuration = True
+            else:
+                start_list.append(result_await_configuration)
+
             rr = utils.score_results(new_query, start_list, match_on_empty_query=True)
 
-            r.JsonRPCAction = JsonRPCAction(method="start", parameters=[ffm, config, sawait, tcp, whkd, ahk])
+            r.JsonRPCAction = JsonRPCAction(method="start",
+                                            parameters=[ffm, config, await_configuration, tcp, whkd, ahk])
         else:
             r.JsonRPCAction = JsonRPCAction(method="start", parameters=[])
             start_list.append(r)
@@ -146,11 +158,11 @@ def append_if_matches(input_string, word_to_check):
         else:
             return input_string + " " + word_to_check
 
+
 class Change(Method):
 
     def __init__(self, settings):
         self.settings = settings
-
 
     def __call__(self, query, word_to_check) -> JsonRPCAction:
         query = "kc " + query
@@ -195,7 +207,8 @@ class Start(Method):
         self._logger = shared.logger(self)
         self._results: list[Result] = []
 
-    def __call__(self, ffm: bool = False, config: Optional[Iterable[Any]] = None, sawait: bool = False,
-                 tcp: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False):
-        self.komorebic.start(ffm=ffm, config=config, sawait=sawait, tcp=tcp, whkd=whkd, ahk=ahk)
+    def __call__(self, ffm: bool = False, config: Optional[Iterable[Any]] = None, await_configuration: bool = False,
+                 tcp_port: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False):
+        self.komorebic.start(ffm=ffm, config=config, await_configuration=await_configuration, tcp_port=tcp_port,
+                             whkd=whkd, ahk=ahk)
         exit_komoflow(self.komorebic, self.pipe, self.pipename)

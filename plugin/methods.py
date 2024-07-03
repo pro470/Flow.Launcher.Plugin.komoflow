@@ -107,7 +107,7 @@ class Query(Method):
 
             result_await_configuration = Result(Title='await-configuration',
                                                 SubTitle="Wait for 'komorebic complete-configuration' to be sent before processing events",
-                                                AutoCompleteText="ffm",
+                                                AutoCompleteText="await-configuration",
                                                 JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "await-configuration"],
                                                                             dontHideAfterAction=True))
 

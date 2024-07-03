@@ -2,7 +2,7 @@ from typing import Optional, Iterable, Any
 
 from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils, icons, api
 from plugin.komorebic_client import WKomorebic
-from utils import state, score_resluts_with_sub, get_first_word
+from utils import state, score_resluts_with_sub, get_first_word, exit_komoflow
 
 
 class Query(Method):
@@ -96,7 +96,8 @@ class Query(Method):
             result_ffm = Result(Title='ffm',
                                 SubTitle="Allow the use of komorebi's custom focus-follows-mouse implementation",
                                 AutoCompleteText="ffm",
-                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ffm"], dontHideAfterAction=True))
+                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ffm"],
+                                                            dontHideAfterAction=True))
 
             if 'ffm' in query:
                 ffm = True
@@ -146,14 +147,9 @@ def append_if_matches(input_string, word_to_check):
 class Change(Method):
 
     def __call__(self, query, word_to_check) -> JsonRPCAction:
-
         query = "kc " + query
 
-        return api.change_query(query=append_if_matches(query,word_to_check))
-
-
-
-
+        return api.change_query(query=append_if_matches(query, word_to_check))
 
 
 class App_focus(Method):
@@ -167,6 +163,7 @@ class App_focus(Method):
 
     def __call__(self, exe: str, hwnd: int):
         self.komorebic.focus_exe(exe=[exe], hwnd=[str(hwnd)])
+        exit_komoflow(self.komorebic, self.pipe, self.pipename)
 
 
 class Quickstart(Method):
@@ -180,6 +177,7 @@ class Quickstart(Method):
 
     def __call__(self):
         self.komorebic.quickstart()
+        exit_komoflow(self.komorebic, self.pipe, self.pipename)
 
 
 class Start(Method):
@@ -194,3 +192,4 @@ class Start(Method):
     def __call__(self, ffm: bool = False, config: Optional[Iterable[Any]] = None, sawait: bool = False,
                  tcp: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False):
         self.komorebic.start(ffm=ffm, config=config, sawait=sawait, tcp=tcp, whkd=whkd, ahk=ahk)
+        exit_komoflow(self.komorebic, self.pipe, self.pipename)

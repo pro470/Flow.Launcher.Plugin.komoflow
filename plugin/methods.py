@@ -101,7 +101,7 @@ class Query(Method):
 
             if 'ffm' in query:
                 ffm = True
-                new_query = new_query.replace("ffm", "")
+                new_query = new_query.replace(" ffm", "")
             else:
                 start_list.append(result_ffm)
 
@@ -113,7 +113,7 @@ class Query(Method):
 
             if 'await-configuration' in query:
                 await_configuration = True
-                new_query = new_query.replace("await-configuration", "")
+                new_query = new_query.replace(" await-configuration", "")
             else:
                 start_list.append(result_await_configuration)
 

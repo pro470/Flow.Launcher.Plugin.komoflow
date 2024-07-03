@@ -77,6 +77,7 @@ class Query(Method):
             self.add_result(scored_results)
 
     def start(self, query: str, state_j):
+        start_list = []
 
         first_word = get_first_word(query)
 
@@ -84,13 +85,27 @@ class Query(Method):
                    SubTitle='Start komorebi.exe as a background process')
 
         if first_word == "start":
-            para_dict = {}
-            para_dict['ffm'] = True
-            r.JsonRPCAction = JsonRPCAction(method="start", parameters=para_dict)
+            ffm: bool = False
+            config: Optional[Iterable[Any]] = None
+            sawait: bool = False
+            tcp: Optional[Iterable[Any]] = None
+            whkd: bool = False
+            ahk: bool = False
+            result_ffm = Result(Title='ffm',
+                                SubTitle="Allow the use of komorebi's custom focus-follows-mouse implementation",
+                                AutoCompleteText=query + "ffm")
+
+            if 'ffm' in query:
+                ffm = True
+            else:
+                start_list.append(result_ffm)
+
+            r.JsonRPCAction = JsonRPCAction(method="start", parameters=[ffm, config, sawait, tcp, whkd, ahk])
         else:
             r.JsonRPCAction = JsonRPCAction(method="start", parameters=[])
+            start_list.append(r)
 
-        rr = utils.score_results(query, [r], match_on_empty_query=True)
+        rr = utils.score_results(query, start_list, match_on_empty_query=True)
 
         for scored_results in rr:
             self.add_result(scored_results)

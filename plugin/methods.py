@@ -147,6 +147,8 @@ class Change(Method):
 
     def __call__(self, query, word_to_check) -> JsonRPCAction:
 
+        query = "kc" + query
+
         return api.change_query(query=append_if_matches(query,word_to_check))
 
 

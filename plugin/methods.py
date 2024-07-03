@@ -146,6 +146,19 @@ class Query(Method):
                 if not new_query.endswith("["):
                     start_list.append(result_ahk)
 
+            result_config = Result(Title='config',
+                                SubTitle="Path to a static configuration JSON file",
+                                AutoCompleteText="config",
+                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "config ["],
+                                                            dontHideAfterAction=True))
+
+            if 'config' in query:
+                ffm = True
+                new_query = new_query.replace(" config", "")
+            else:
+                start_list.append(result_config)
+
+
             rr = utils.score_results(new_query, start_list, match_on_empty_query=True)
 
             r.JsonRPCAction = JsonRPCAction(method="start",

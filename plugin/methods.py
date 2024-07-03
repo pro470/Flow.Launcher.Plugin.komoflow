@@ -86,6 +86,7 @@ class Query(Method):
 
         if first_word == "start":
 
+            new_query = query.replace('start', '')
             ffm: bool = False
             config: Optional[Iterable[Any]] = None
             sawait: bool = False
@@ -94,14 +95,14 @@ class Query(Method):
             ahk: bool = False
             result_ffm = Result(Title='ffm',
                                 SubTitle="Allow the use of komorebi's custom focus-follows-mouse implementation",
-                                AutoCompleteText=query + "ffm")
+                                AutoCompleteText="ffm")
 
             if 'ffm' in query:
                 ffm = True
             else:
                 start_list.append(result_ffm)
 
-            rr = utils.score_results(query.split()[1], start_list, match_on_empty_query=True)
+            rr = utils.score_results(new_query, start_list, match_on_empty_query=True)
 
             r.JsonRPCAction = JsonRPCAction(method="start", parameters=[ffm, config, sawait, tcp, whkd, ahk])
         else:

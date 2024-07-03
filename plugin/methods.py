@@ -148,6 +148,10 @@ def append_if_matches(input_string, word_to_check):
 
 class Change(Method):
 
+    def __init__(self, settings):
+        self.settings = settings
+
+
     def __call__(self, query, word_to_check) -> JsonRPCAction:
         query = "kc " + query
 

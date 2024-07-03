@@ -64,6 +64,38 @@ class Query(Method):
         for scored_result in scored_results:
             self.add_result(scored_result)
 
+    def quickstart(self, query: str, state_j):
+        r = Result(Title='quickstart',
+                   SubTitle='Gather example configurations for a new-user quickstart',
+                   JsonRPCAction=JsonRPCAction(method="quickstart",
+                                               parameters=[]))
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+
+    def start(self, query: str, state_j):
+
+        first_word = get_first_word(query)
+
+        r = Result(Title='start',
+                   SubTitle='Start komorebi.exe as a background process')
+
+        if first_word == "start":
+            para_dict = {}
+            para_dict['ffm'] = True
+            r.JsonRPCAction = JsonRPCAction(method="start", parameters=para_dict)
+        else:
+            r.JsonRPCAction = JsonRPCAction(method="start", parameters=[])
+
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+
+
 
 class Context_menu(Method):
 
@@ -89,3 +121,15 @@ class App_focus(Method):
 
     def __call__(self, exe: str, hwnd: int):
         self.komorebic.focus_exe(exe=[exe], hwnd=[str(hwnd)])
+
+class Quickstart(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+        self._logger = shared.logger(self)
+        self._results: list[Result] = []
+
+    def __call__(self):
+        self.komorebic.quickstart()

@@ -103,7 +103,8 @@ class Query(Method):
                 ffm = True
                 new_query = new_query.replace(" ffm", "")
             else:
-                start_list.append(result_ffm)
+                if not new_query.endswith("["):
+                    start_list.append(result_ffm)
 
             result_await_configuration = Result(Title='await-configuration',
                                                 SubTitle="Wait for 'komorebic complete-configuration' to be sent before processing events",
@@ -116,20 +117,34 @@ class Query(Method):
                 await_configuration = True
                 new_query = new_query.replace(" await-configuration", "")
             else:
-                start_list.append(result_await_configuration)
+                if not new_query.endswith("["):
+                    start_list.append(result_await_configuration)
 
             result_whkd = Result(Title='whkd',
-                                SubTitle="Start whkd in a background process",
-                                AutoCompleteText="whkd",
-                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd"],
-                                                            dontHideAfterAction=True))
+                                 SubTitle="Start whkd in a background process",
+                                 AutoCompleteText="whkd",
+                                 JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd"],
+                                                             dontHideAfterAction=True))
 
             if 'whkd' in query:
                 ffm = True
                 new_query = new_query.replace(" whkd", "")
             else:
-                start_list.append(result_whkd)
+                if not new_query.endswith("["):
+                    start_list.append(result_whkd)
 
+            result_ahk = Result(Title='ahk',
+                                SubTitle="Start autohotkey configuration file",
+                                AutoCompleteText="ahk",
+                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ahk"],
+                                                            dontHideAfterAction=True))
+
+            if 'ahk' in query:
+                ffm = True
+                new_query = new_query.replace(" ahk", "")
+            else:
+                if not new_query.endswith("["):
+                    start_list.append(result_ahk)
 
             rr = utils.score_results(new_query, start_list, match_on_empty_query=True)
 

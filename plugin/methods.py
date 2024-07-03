@@ -108,7 +108,8 @@ class Query(Method):
             result_await_configuration = Result(Title='await-configuration',
                                                 SubTitle="Wait for 'komorebic complete-configuration' to be sent before processing events",
                                                 AutoCompleteText="await-configuration",
-                                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "await-configuration"],
+                                                JsonRPCAction=JsonRPCAction(method="change",
+                                                                            parameters=[query, "await-configuration"],
                                                                             dontHideAfterAction=True))
 
             if 'await-configuration' in query:
@@ -167,7 +168,7 @@ class Change(Method):
         self.settings = settings
 
     def __call__(self, query, word_to_check) -> JsonRPCAction:
-        query = "kc " + query
+        query = self.settings["ActionKeyword"] + " " + query
 
         return api.change_query(query=append_if_matches(query, word_to_check))
 

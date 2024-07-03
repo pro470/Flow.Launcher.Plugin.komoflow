@@ -95,8 +95,8 @@ class Query(Method):
             ahk: bool = False
             result_ffm = Result(Title='ffm',
                                 SubTitle="Allow the use of komorebi's custom focus-follows-mouse implementation",
-                                AutoCompleteText="ffm")
-            result_ffm.add_action(Change(), parameters=[query, "ffm"], dont_hide_after_action=True)
+                                AutoCompleteText="ffm",
+                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ffm"], dont_hide_after_action=True))
 
             if 'ffm' in query:
                 ffm = True

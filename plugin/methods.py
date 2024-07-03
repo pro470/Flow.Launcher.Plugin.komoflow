@@ -118,6 +118,19 @@ class Query(Method):
             else:
                 start_list.append(result_await_configuration)
 
+            result_whkd = Result(Title='whkd',
+                                SubTitle="Start whkd in a background process",
+                                AutoCompleteText="whkd",
+                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd"],
+                                                            dontHideAfterAction=True))
+
+            if 'whkd' in query:
+                ffm = True
+                new_query = new_query.replace(" whkd", "")
+            else:
+                start_list.append(result_whkd)
+
+
             rr = utils.score_results(new_query, start_list, match_on_empty_query=True)
 
             r.JsonRPCAction = JsonRPCAction(method="start",

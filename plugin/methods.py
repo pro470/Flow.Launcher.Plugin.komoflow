@@ -141,7 +141,7 @@ def append_if_matches(input_string, word_to_check):
         # Append the remaining part to the input string
         return input_string + remaining_part
     else:
-        return input_string
+        return input_string + word_to_check
 
 
 class Change(Method):

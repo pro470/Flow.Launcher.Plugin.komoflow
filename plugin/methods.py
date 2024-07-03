@@ -85,6 +85,7 @@ class Query(Method):
                    SubTitle='Start komorebi.exe as a background process')
 
         if first_word == "start":
+            query.replace('start', '')
             ffm: bool = False
             config: Optional[Iterable[Any]] = None
             sawait: bool = False
@@ -100,12 +101,13 @@ class Query(Method):
             else:
                 start_list.append(result_ffm)
 
+            rr = utils.score_results(query, start_list, match_on_empty_query=True)
+
             r.JsonRPCAction = JsonRPCAction(method="start", parameters=[ffm, config, sawait, tcp, whkd, ahk])
         else:
             r.JsonRPCAction = JsonRPCAction(method="start", parameters=[])
             start_list.append(r)
-
-        rr = utils.score_results(query, start_list, match_on_empty_query=True)
+            rr = utils.score_results(query, start_list, match_on_empty_query=True)
 
         for scored_results in rr:
             self.add_result(scored_results)

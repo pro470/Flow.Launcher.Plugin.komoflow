@@ -1,3 +1,5 @@
+from typing import Optional, Iterable, Any
+
 from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils, icons
 from plugin.komorebic_client import WKomorebic
 from utils import state, score_resluts_with_sub, get_first_word
@@ -74,7 +76,6 @@ class Query(Method):
         for scored_results in rr:
             self.add_result(scored_results)
 
-
     def start(self, query: str, state_j):
 
         first_word = get_first_word(query)
@@ -93,8 +94,6 @@ class Query(Method):
 
         for scored_results in rr:
             self.add_result(scored_results)
-
-
 
 
 class Context_menu(Method):
@@ -122,6 +121,7 @@ class App_focus(Method):
     def __call__(self, exe: str, hwnd: int):
         self.komorebic.focus_exe(exe=[exe], hwnd=[str(hwnd)])
 
+
 class Quickstart(Method):
 
     def __init__(self, komorebic: WKomorebic, pipe, pipename):
@@ -133,3 +133,17 @@ class Quickstart(Method):
 
     def __call__(self):
         self.komorebic.quickstart()
+
+
+class Start(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+        self._logger = shared.logger(self)
+        self._results: list[Result] = []
+
+    def __call__(self, ffm: bool = False, config: Optional[Iterable[Any]] = None, sawait: bool = False,
+                 tcp: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False):
+        self.komorebic.start(ffm=ffm, config=config, sawait=sawait, tcp=tcp, whkd=whkd, ahk=ahk)

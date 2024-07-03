@@ -1,6 +1,6 @@
 from typing import Optional, Iterable, Any
 
-from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils, icons
+from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils, icons, api
 from plugin.komorebic_client import WKomorebic
 from utils import state, score_resluts_with_sub, get_first_word
 
@@ -96,6 +96,7 @@ class Query(Method):
             result_ffm = Result(Title='ffm',
                                 SubTitle="Allow the use of komorebi's custom focus-follows-mouse implementation",
                                 AutoCompleteText="ffm")
+            result_ffm.add_action(Change(), parameters=[query, "ffm"], dont_hide_after_action=True)
 
             if 'ffm' in query:
                 ffm = True
@@ -125,6 +126,32 @@ class Context_menu(Method):
 
     def __call__(self, data) -> ResultResponse:
         return self.return_results()
+
+
+def append_if_matches(input_string, word_to_check):
+    words = input_string.split()
+    if not words:
+        return input_string  # If input_string is empty or only whitespace, return as is
+
+    last_word = words[-1]
+    if word_to_check.startswith(last_word):
+        # Find the part of word_to_check that is not in last_word
+        remaining_part = word_to_check[len(last_word):]
+        # Append the remaining part to the input string
+        return input_string + remaining_part
+    else:
+        return input_string
+
+
+class Change(Method):
+
+    def __call__(self, query, word_to_check) -> JsonRPCAction:
+
+        return api.change_query(query=append_if_matches(query,word_to_check))
+
+
+
+
 
 
 class App_focus(Method):

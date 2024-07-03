@@ -149,7 +149,7 @@ class Change(Method):
 
         query = "kc " + query
 
-        return api.change_query(query=append_if_matches(query,word_to_check), requery=True)
+        return api.change_query(query=append_if_matches(query,word_to_check))
 
 
 

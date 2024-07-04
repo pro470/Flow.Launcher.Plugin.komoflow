@@ -89,7 +89,7 @@ class Query(Method):
             ffm: bool = False
             config: Optional[Iterable[Any]] = None
             await_configuration: bool = False
-            tcp: Optional[Iterable[Any]] = None
+            tcp_port: Optional[Iterable[Any]] = None
             whkd: bool = False
             ahk: bool = False
             result_ffm = Result(Title='ffm',
@@ -126,7 +126,7 @@ class Query(Method):
                                                              dontHideAfterAction=True))
 
             if 'whkd' in query:
-                ffm = True
+                whkd = True
                 new_query = new_query.replace(" whkd", "")
             else:
                 if not word_before_last_bracket(query):
@@ -139,7 +139,7 @@ class Query(Method):
                                                             dontHideAfterAction=True))
 
             if 'ahk' in query:
-                ffm = True
+                ahk = True
                 new_query = new_query.replace(" ahk", "")
             else:
                 if not word_before_last_bracket(query):
@@ -152,7 +152,6 @@ class Query(Method):
                                                                dontHideAfterAction=True))
 
             if 'config' in query:
-                ffm = True
                 if re.search(r'\s+config\s*\[.*?\]', new_query):
                     matches = re.search(r'\s+config\s*\[(.*?)\]', query)
                     config = [matches.group(1)]
@@ -162,6 +161,23 @@ class Query(Method):
             else:
                 if not word_before_last_bracket(query):
                     start_list.append(result_config)
+
+            result_tcp_port = Result(Title='tcp-port',
+                                     SubTitle="Start a TCP server on the given port to allow the direct sending of SocketMessages",
+                                     AutoCompleteText="tcp-port",
+                                     JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "tcp-port [ "],
+                                                                 dontHideAfterAction=True))
+
+            if 'tcp-port' in query:
+                if re.search(r'\s+tcp-port\s*\[.*?\]', new_query):
+                    matches = re.search(r'\s+tcp-port\s*\[(.*?)\]', query)
+                    tcp_port = [matches.group(1)]
+                    new_query = re.sub(r'\s+tcp-port\s*\[.*?\]', '', new_query)
+                else:
+                    new_query = new_query.replace(" tcp-port", "")
+            else:
+                if not word_before_last_bracket(query):
+                    start_list.append(result_tcp_port)
 
             if word_before_last_bracket(query):
                 word_before = word_before_last_bracket(query)
@@ -180,10 +196,25 @@ class Query(Method):
 
                         start_list.append(match_result)
 
+                elif word_before == "tcp-port":
+
+                    new_query = re.sub(r'\s*\[\s*', '', new_query)
+
+                    if not new_query.isdigit():
+                        notdigit = Result(Title='Not a number needs to be a number')
+                        self.add_result(notdigit)
+
             rr = utils.score_results(new_query, start_list, match_on_empty_query=True)
 
+            r = Result(Title='run',
+                       SubTitle='run start command with this parameters')
+
             r.JsonRPCAction = JsonRPCAction(method="start",
-                                            parameters=[ffm, config, await_configuration, tcp, whkd, ahk])
+                                            parameters=[ffm, config, await_configuration, tcp_port, whkd, ahk])
+
+            if not word_before_last_bracket(query):
+                self.add_result(r)
+
         else:
             r.JsonRPCAction = JsonRPCAction(method="start", parameters=[])
             start_list.append(r)

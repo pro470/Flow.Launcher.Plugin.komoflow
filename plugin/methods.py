@@ -1,5 +1,5 @@
 from typing import Optional, Iterable, Any
-
+import re, os, fnmatch
 from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils, icons, api
 from plugin.komorebic_client import WKomorebic
 from utils import state, score_resluts_with_sub, get_first_word, exit_komoflow
@@ -8,11 +8,10 @@ from utils import state, score_resluts_with_sub, get_first_word, exit_komoflow
 class Query(Method):
 
     def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename
-        self._logger = shared.logger(self)
-        self._results: list[Result] = []
         self.functions_dict = {}
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
@@ -103,7 +102,7 @@ class Query(Method):
                 ffm = True
                 new_query = new_query.replace(" ffm", "")
             else:
-                if not new_query.endswith("["):
+                if not word_before_last_bracket(query):
                     start_list.append(result_ffm)
 
             result_await_configuration = Result(Title='await-configuration',
@@ -117,7 +116,7 @@ class Query(Method):
                 await_configuration = True
                 new_query = new_query.replace(" await-configuration", "")
             else:
-                if not new_query.endswith("["):
+                if not word_before_last_bracket(query):
                     start_list.append(result_await_configuration)
 
             result_whkd = Result(Title='whkd',
@@ -130,7 +129,7 @@ class Query(Method):
                 ffm = True
                 new_query = new_query.replace(" whkd", "")
             else:
-                if not new_query.endswith("["):
+                if not word_before_last_bracket(query):
                     start_list.append(result_whkd)
 
             result_ahk = Result(Title='ahk',
@@ -143,21 +142,43 @@ class Query(Method):
                 ffm = True
                 new_query = new_query.replace(" ahk", "")
             else:
-                if not new_query.endswith("["):
+                if not word_before_last_bracket(query):
                     start_list.append(result_ahk)
 
             result_config = Result(Title='config',
-                                SubTitle="Path to a static configuration JSON file",
-                                AutoCompleteText="config",
-                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "config ["],
-                                                            dontHideAfterAction=True))
+                                   SubTitle="Path to a static configuration JSON file",
+                                   AutoCompleteText="config",
+                                   JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "config [ "],
+                                                               dontHideAfterAction=True))
 
             if 'config' in query:
                 ffm = True
-                new_query = new_query.replace(" config", "")
+                if re.search(r'\s+config\s*\[.*?\]', new_query):
+                    matches = re.search(r'\s+config\s*\[(.*?)\]', query)
+                    config = [matches.group(1)]
+                    new_query = re.sub(r'\s+config\s*\[.*?\]', '', new_query)
+                else:
+                    new_query = new_query.replace(" config", "")
             else:
-                start_list.append(result_config)
+                if not word_before_last_bracket(query):
+                    start_list.append(result_config)
 
+            if word_before_last_bracket(query):
+                word_before = word_before_last_bracket(query)
+
+                if word_before == "config":
+                    matches = find_files_in_user_directory()
+
+                    new_query = new_query.replace(" [", "")
+
+                    for match in matches:
+                        match_result = Result(Title=match,
+                                              AutoCompleteText=match,
+                                              JsonRPCAction=JsonRPCAction(method="change",
+                                                                          parameters=[query, match + " ]"],
+                                                                          dontHideAfterAction=True))
+
+                        start_list.append(match_result)
 
             rr = utils.score_results(new_query, start_list, match_on_empty_query=True)
 
@@ -175,14 +196,67 @@ class Query(Method):
 class Context_menu(Method):
 
     def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename
-        self._logger = shared.logger(self)
-        self._results: list[Result] = []
 
     def __call__(self, data) -> ResultResponse:
         return self.return_results()
+
+
+def find_files_in_user_directory(filename="komorebi.json"):
+    """
+    Searches for all instances of the specified file in the current user's home directory and its subdirectories.
+
+    Args:
+    - filename (str): The name of the file to search for. Default is "komorebi.json".
+
+    Returns:
+    - list of str: A list of full paths to each found file.
+    """
+    matches = []
+    user_home_dir = os.path.expanduser("~")
+
+    def scan_directory(directory):
+        try:
+            with os.scandir(directory) as it:
+                for entry in it:
+                    if entry.is_file() and entry.name == filename:
+                        matches.append(entry.path)
+                    elif entry.is_dir():
+                        scan_directory(entry.path)
+        except PermissionError:
+            # Skip directories that cannot be accessed
+            pass
+
+    scan_directory(user_home_dir)
+    return matches
+
+
+def word_before_last_bracket(text):
+    # Find the last occurrence of '['
+    last_bracket_index = text.rfind('[')
+
+    # If no '[' found, return None or an appropriate message
+    if last_bracket_index == -1:
+        return None
+
+    # Extract the substring after the last '['
+    substring_after_bracket = text[last_bracket_index + 1:]
+
+    # Check if the substring contains ']'
+    if ']' in substring_after_bracket:
+        return None
+
+    # Extract the substring before the last '['
+    substring_before_bracket = text[:last_bracket_index]
+
+    # Split the substring into words
+    words = substring_before_bracket.split()
+
+    # Return the last word in the split list
+    return words[-1] if words else None
 
 
 def append_if_matches(input_string, word_to_check):
@@ -206,6 +280,7 @@ def append_if_matches(input_string, word_to_check):
 class Change(Method):
 
     def __init__(self, settings):
+        super().__init__()
         self.settings = settings
 
     def __call__(self, query, word_to_check) -> JsonRPCAction:
@@ -217,42 +292,36 @@ class Change(Method):
 class App_focus(Method):
 
     def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename
-        self._logger = shared.logger(self)
-        self._results: list[Result] = []
 
     def __call__(self, exe: str, hwnd: int):
         self.komorebic.focus_exe(exe=[exe], hwnd=[str(hwnd)])
-        exit_komoflow(self.komorebic, self.pipe, self.pipename)
 
 
 class Quickstart(Method):
 
     def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename
-        self._logger = shared.logger(self)
-        self._results: list[Result] = []
 
     def __call__(self):
         self.komorebic.quickstart()
-        exit_komoflow(self.komorebic, self.pipe, self.pipename)
 
 
 class Start(Method):
 
     def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename
-        self._logger = shared.logger(self)
-        self._results: list[Result] = []
 
     def __call__(self, ffm: bool = False, config: Optional[Iterable[Any]] = None, await_configuration: bool = False,
                  tcp_port: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False):
         self.komorebic.start(ffm=ffm, config=config, await_configuration=await_configuration, tcp_port=tcp_port,
                              whkd=whkd, ahk=ahk)
-        exit_komoflow(self.komorebic, self.pipe, self.pipename)

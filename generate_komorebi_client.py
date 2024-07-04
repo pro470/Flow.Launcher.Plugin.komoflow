@@ -55,7 +55,7 @@ def extract_commands_and_arguments(help_output):
 
 
 def generate_script(commands, arguments, options):
-    script_content = '''import subprocess 
+    script_content = '''from subprocess import run, CompletedProcess 
 from typing import Iterable, Optional, Any
  
 
@@ -90,9 +90,13 @@ class WKomorebic:
 
             rr = ', ' + ', '.join(option_parameter) if option_parameter else ''
             ff = '\n        '.join(option_if) + '\n        ' if option_if else ''
-            script_content += f'''    def {method_name}(self{method_arguments}{rr}):
+            script_content += f'''    def {method_name}(self{method_arguments}{rr}) -> CompletedProcess[str]:
         cmd = [self.path, '{command}'{method_arguments}]
-        {ff}subprocess.run(args=cmd, shell=True)
+        {ff}result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
 
 '''
 

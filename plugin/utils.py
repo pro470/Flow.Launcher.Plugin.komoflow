@@ -1,11 +1,13 @@
 import json
 import logging
+import subprocess
 import time
 import os
 import ctypes
 import ctypes.wintypes
 from pyflowlauncher import Result, string_matcher
 from typing import Iterable, Generator, Optional
+from komorebic_client import WKomorebic
 
 # Constants
 PIPE_ACCESS_DUPLEX = 0x00000003
@@ -47,11 +49,11 @@ def create_named_pipe(pipename):
     return pipe
 
 
-def connect_komorebi(wkomorebic, pipename) -> None:
+def connect_komorebi(wkomorebic: WKomorebic, pipename) -> None:
     wkomorebic.subscribe_pipe(pipename)
 
 
-def exit_komoflow(wkomorebic, pipe, pipename) -> None:
+def exit_komoflow(wkomorebic: WKomorebic, pipe, pipename) -> None:
     wkomorebic.unsubscribe_pipe(pipename)
     DisconnectNamedPipe(pipe)
     CloseHandle(pipe)
@@ -60,8 +62,13 @@ def exit_komoflow(wkomorebic, pipe, pipename) -> None:
 def state(pipe):
     # read komorebi event
     try:
+        tries = 0
+        buffer = None
         while True:
+            if tries == 5:
+                break
 
+            tries = tries + 1
             buffer = ctypes.create_string_buffer(64 * 1024)
             bytes_read = ctypes.wintypes.DWORD()
             success = ReadFile(pipe, buffer, len(buffer), ctypes.byref(bytes_read), None)
@@ -70,13 +77,16 @@ def state(pipe):
             else:
                 time.sleep(0.1)
 
-        message = buffer.value.decode('utf-8')
+        if buffer:
+            message = buffer.value.decode('utf-8')
 
-        event = json.loads(message)
-        # event = json.loads(data)
-        # print(json.dumps(event, indent=4))
+            event = json.loads(message)
+            # event = json.loads(data)
+            # print(json.dumps(event, indent=4))
 
-        event_state = event['state']
+            event_state = event['state']
+        else:
+            return None
 
         return event_state
 
@@ -118,3 +128,94 @@ def get_first_word(s: str):
     if words:
         return words[0]
     return None
+
+
+def check_process_running(process_name):
+    """
+    Check if a process with the given name is running on Windows.
+    """
+    try:
+        # Use tasklist to list all running processes without opening a shell window
+        result = subprocess.run(['tasklist', '/FI', f'IMAGENAME eq {process_name}'], stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
+        output = result.stdout.strip()
+
+        # Check if the process_name is in the tasklist output
+        if process_name.lower() in output.lower():
+            return True
+        else:
+            return False
+    except Exception:
+        return False
+
+
+def find_files_in_user_directory(filename="komorebi.json"):
+    """
+    Searches for all instances of the specified file in the current user's home directory and its subdirectories.
+
+    Args:
+    - filename (str): The name of the file to search for. Default is "komorebi.json".
+
+    Returns:
+    - list of str: A list of full paths to each found file.
+    """
+    matches = []
+    user_home_dir = os.path.expanduser("~")
+
+    def scan_directory(directory):
+        try:
+            with os.scandir(directory) as it:
+                for entry in it:
+                    if entry.is_file() and entry.name == filename:
+                        matches.append(entry.path)
+                    elif entry.is_dir():
+                        scan_directory(entry.path)
+        except PermissionError:
+            # Skip directories that cannot be accessed
+            pass
+
+    scan_directory(user_home_dir)
+    return matches
+
+
+def word_before_last_bracket(text):
+    # Find the last occurrence of '['
+    last_bracket_index = text.rfind('[')
+
+    # If no '[' found, return None or an appropriate message
+    if last_bracket_index == -1:
+        return None
+
+    # Extract the substring after the last '['
+    substring_after_bracket = text[last_bracket_index + 1:]
+
+    # Check if the substring contains ']'
+    if ']' in substring_after_bracket:
+        return None
+
+    # Extract the substring before the last '['
+    substring_before_bracket = text[:last_bracket_index]
+
+    # Split the substring into words
+    words = substring_before_bracket.split()
+
+    # Return the last word in the split list
+    return words[-1] if words else None
+
+
+def append_if_matches(input_string, word_to_check):
+    words = input_string.split()
+    if not words:
+        return input_string  # If input_string is empty or only whitespace, return as is
+
+    last_word = words[-1]
+    if word_to_check.startswith(last_word):
+        # Find the part of word_to_check that is not in last_word
+        remaining_part = word_to_check[len(last_word):]
+        # Append the remaining part to the input string
+        return input_string + remaining_part
+    else:
+        if input_string.endswith(" "):
+            return input_string + word_to_check
+        else:
+            return input_string + " " + word_to_check

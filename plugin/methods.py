@@ -2,7 +2,8 @@ from typing import Optional, Iterable, Any
 import re, os, fnmatch
 from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils, icons, api
 from plugin.komorebic_client import WKomorebic
-from utils import state, score_resluts_with_sub, get_first_word, exit_komoflow
+from utils import state, score_resluts_with_sub, get_first_word, append_if_matches, word_before_last_bracket, \
+    find_files_in_user_directory
 
 
 class Query(Method):
@@ -21,11 +22,14 @@ class Query(Method):
 
     def __call__(self, query: str) -> ResultResponse:
         state_json = state(self.pipe)
-        if not state_json['is_paused']:
-            if get_first_word(query) in self.functions_dict:
-                self.functions_dict[get_first_word(query)](query, state_json)
-            else:
-                self.call_methods(query, state_json)
+        if state_json is None:
+            self.start(query, state_json)
+        else:
+            if not state_json['is_paused']:
+                if get_first_word(query) in self.functions_dict:
+                    self.functions_dict[get_first_word(query)](query, state_json)
+                else:
+                    self.call_methods(query, state_json)
         return self.return_results()
 
     def call_methods(self, query: str, state_j):
@@ -171,7 +175,7 @@ class Query(Method):
             if 'tcp-port' in query:
                 if re.search(r'\s+tcp-port\s*\[.*?\]', new_query):
                     matches = re.search(r'\s+tcp-port\s*\[(.*?)\]', query)
-                    tcp_port = [matches.group(1)]
+                    tcp_port = [matches.group(1).strip()]
                     new_query = re.sub(r'\s+tcp-port\s*\[.*?\]', '', new_query)
                 else:
                     new_query = new_query.replace(" tcp-port", "")
@@ -200,7 +204,7 @@ class Query(Method):
 
                     new_query = re.sub(r'\s*\[\s*', '', new_query)
 
-                    if not new_query.isdigit():
+                    if not new_query.strip().isdigit():
                         notdigit = Result(Title='Not a number needs to be a number')
                         self.add_result(notdigit)
 
@@ -220,8 +224,97 @@ class Query(Method):
             start_list.append(r)
             rr = utils.score_results(query, start_list, match_on_empty_query=True)
 
+        tcp_port_nummer = re.search(r'\s+tcp-port\s*\[(.*?)\]', query)
+
         for scored_results in rr:
             self.add_result(scored_results)
+
+        if tcp_port_nummer:
+            if not tcp_port_nummer.group(1).strip().isdigit():
+                self._results = [Result(Title='Not a number needs to be a number')]
+
+        config_path = re.search(r'\s+config\s*\[(.*?)\]', query)
+        if config_path:
+            if not os.path.exists(config_path.group(1).strip()):
+                if not config_path.group(1).strip().endswith('komorebi.json'):
+                    self._results = [Result(Title='Path dont exits or is not a komorebi.json path')]
+
+    def stop(self, query: str, state_j):
+
+        stop_list = []
+
+        first_word = get_first_word(query)
+
+        r = Result(Title='stop',
+                   SubTitle='Stop the komorebi.exe process and restore all hidden windows')
+
+        if first_word == "stop":
+
+            new_query = query.replace('stop', '')
+
+            whkd: bool = False
+
+            result_whkd = Result(Title='whkd',
+                                 SubTitle="Start whkd in a background process",
+                                 AutoCompleteText="whkd",
+                                 JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd"],
+                                                             dontHideAfterAction=True))
+
+            if 'whkd' in query:
+                whkd = True
+                new_query = new_query.replace(" whkd", "")
+            else:
+                if not word_before_last_bracket(query):
+                    stop_list.append(result_whkd)
+
+            rr = utils.score_results(new_query, stop_list, match_on_empty_query=True)
+
+            r = Result(Title='run',
+                       SubTitle='Stop the komorebi.exe process and restore all hidden windows',
+                       JsonRPCAction=JsonRPCAction(method="stop", parameters=[whkd]))
+
+            if not word_before_last_bracket(query):
+                self.add_result(r)
+
+        else:
+            r.JsonRPCAction = JsonRPCAction(method="stop", parameters=[])
+            stop_list.append(r)
+            rr = utils.score_results(query, stop_list, match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+    def check(self, query: str, state_j):
+        r = Result(Title='check',
+                   SubTitle='Check komorebi configuration and related files for common errors',
+                   JsonRPCAction=JsonRPCAction(method="check",
+                                               parameters=[]))
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+    def configuration(self, query: str, state_j):
+        r = Result(Title='configuration',
+                   SubTitle='Show the path to komorebi.json',
+                   JsonRPCAction=JsonRPCAction(method="configuration",
+                                               parameters=[]))
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+    def whkdrc(self, query: str, state_j):
+        r = Result(Title='whkdrc',
+                   SubTitle='Show the path to whkdrc',
+                   JsonRPCAction=JsonRPCAction(method="whkdrc",
+                                               parameters=[]))
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+
 
 
 class Context_menu(Method):
@@ -234,78 +327,6 @@ class Context_menu(Method):
 
     def __call__(self, data) -> ResultResponse:
         return self.return_results()
-
-
-def find_files_in_user_directory(filename="komorebi.json"):
-    """
-    Searches for all instances of the specified file in the current user's home directory and its subdirectories.
-
-    Args:
-    - filename (str): The name of the file to search for. Default is "komorebi.json".
-
-    Returns:
-    - list of str: A list of full paths to each found file.
-    """
-    matches = []
-    user_home_dir = os.path.expanduser("~")
-
-    def scan_directory(directory):
-        try:
-            with os.scandir(directory) as it:
-                for entry in it:
-                    if entry.is_file() and entry.name == filename:
-                        matches.append(entry.path)
-                    elif entry.is_dir():
-                        scan_directory(entry.path)
-        except PermissionError:
-            # Skip directories that cannot be accessed
-            pass
-
-    scan_directory(user_home_dir)
-    return matches
-
-
-def word_before_last_bracket(text):
-    # Find the last occurrence of '['
-    last_bracket_index = text.rfind('[')
-
-    # If no '[' found, return None or an appropriate message
-    if last_bracket_index == -1:
-        return None
-
-    # Extract the substring after the last '['
-    substring_after_bracket = text[last_bracket_index + 1:]
-
-    # Check if the substring contains ']'
-    if ']' in substring_after_bracket:
-        return None
-
-    # Extract the substring before the last '['
-    substring_before_bracket = text[:last_bracket_index]
-
-    # Split the substring into words
-    words = substring_before_bracket.split()
-
-    # Return the last word in the split list
-    return words[-1] if words else None
-
-
-def append_if_matches(input_string, word_to_check):
-    words = input_string.split()
-    if not words:
-        return input_string  # If input_string is empty or only whitespace, return as is
-
-    last_word = words[-1]
-    if word_to_check.startswith(last_word):
-        # Find the part of word_to_check that is not in last_word
-        remaining_part = word_to_check[len(last_word):]
-        # Append the remaining part to the input string
-        return input_string + remaining_part
-    else:
-        if input_string.endswith(" "):
-            return input_string + word_to_check
-        else:
-            return input_string + " " + word_to_check
 
 
 class Change(Method):
@@ -356,3 +377,57 @@ class Start(Method):
                  tcp_port: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False):
         self.komorebic.start(ffm=ffm, config=config, await_configuration=await_configuration, tcp_port=tcp_port,
                              whkd=whkd, ahk=ahk)
+
+
+class Stop(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, whkd: bool):
+        self.komorebic.start(whkd=whkd)
+
+
+class Check(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self) -> JsonRPCAction:
+        result = self.komorebic.check()
+
+        return api.copy_to_clipboard(str(result.stdout))
+
+
+class Configuration(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self) -> JsonRPCAction:
+        result = self.komorebic.configuration()
+
+        return api.copy_to_clipboard(str(result.stdout))
+
+
+class Whkdrc(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self) -> JsonRPCAction:
+        result = self.komorebic.whkdrc()
+
+        return api.copy_to_clipboard(str(result.stdout))

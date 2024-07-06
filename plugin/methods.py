@@ -89,7 +89,8 @@ class Query(Method):
 
         if first_word == "start":
 
-            new_query = query.replace('start', '')
+            new_query = query.strip().replace('start', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
             ffm: bool = False
             config: Optional[Iterable[Any]] = None
             await_configuration: bool = False
@@ -99,12 +100,13 @@ class Query(Method):
             result_ffm = Result(Title='ffm',
                                 SubTitle="Allow the use of komorebi's custom focus-follows-mouse implementation",
                                 AutoCompleteText="ffm",
-                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ffm"],
+                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ffm", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
                                                             dontHideAfterAction=True))
 
             if 'ffm' in query:
                 ffm = True
-                new_query = new_query.replace(" ffm", "")
+                new_query = new_query.strip().replace("ffm", "")
+                new_query = re.sub(r'\s+', ' ', new_query).strip()
             else:
                 if not word_before_last_bracket(query):
                     start_list.append(result_ffm)
@@ -113,12 +115,13 @@ class Query(Method):
                                                 SubTitle="Wait for 'komorebic complete-configuration' to be sent before processing events",
                                                 AutoCompleteText="await-configuration",
                                                 JsonRPCAction=JsonRPCAction(method="change",
-                                                                            parameters=[query, "await-configuration"],
+                                                                            parameters=[query, "await-configuration", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
                                                                             dontHideAfterAction=True))
 
             if 'await-configuration' in query:
                 await_configuration = True
-                new_query = new_query.replace(" await-configuration", "")
+                new_query = new_query.strip().replace("await-configuration", "")
+                new_query = re.sub(r'\s+', ' ', new_query).strip()
             else:
                 if not word_before_last_bracket(query):
                     start_list.append(result_await_configuration)
@@ -126,12 +129,13 @@ class Query(Method):
             result_whkd = Result(Title='whkd',
                                  SubTitle="Start whkd in a background process",
                                  AutoCompleteText="whkd",
-                                 JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd"],
+                                 JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
                                                              dontHideAfterAction=True))
 
             if 'whkd' in query:
                 whkd = True
-                new_query = new_query.replace(" whkd", "")
+                new_query = new_query.strip().replace("whkd", "")
+                new_query = re.sub(r'\s+', ' ', new_query).strip()
             else:
                 if not word_before_last_bracket(query):
                     start_list.append(result_whkd)
@@ -139,12 +143,13 @@ class Query(Method):
             result_ahk = Result(Title='ahk',
                                 SubTitle="Start autohotkey configuration file",
                                 AutoCompleteText="ahk",
-                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ahk"],
+                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ahk", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
                                                             dontHideAfterAction=True))
 
             if 'ahk' in query:
                 ahk = True
-                new_query = new_query.replace(" ahk", "")
+                new_query = new_query.strip().replace("ahk", "")
+                new_query = re.sub(r'\s+', ' ', new_query).strip()
             else:
                 if not word_before_last_bracket(query):
                     start_list.append(result_ahk)
@@ -152,16 +157,17 @@ class Query(Method):
             result_config = Result(Title='config',
                                    SubTitle="Path to a static configuration JSON file",
                                    AutoCompleteText="config",
-                                   JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "config [ "],
+                                   JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "config [ ", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
                                                                dontHideAfterAction=True))
 
-            if 'config' in query:
-                if re.search(r'\s+config\s*\[.*?\]', new_query):
-                    matches = re.search(r'\s+config\s*\[(.*?)\]', query)
+            if ' config ' in query:
+                if re.search(r'\bconfig\s*\[.*?\]', new_query):
+                    matches = re.search(r'\bconfig\s*\[(.*?)\]', query)
                     config = [matches.group(1)]
-                    new_query = re.sub(r'\s+config\s*\[.*?\]', '', new_query)
+                    new_query = re.sub(r'\bconfig\b\s*\[.*?\]', '', new_query)
+                    new_query = re.sub(r'\s+', ' ', new_query).strip()
                 else:
-                    new_query = new_query.replace(" config", "")
+                    new_query = new_query.strip().replace("config", "")
             else:
                 if not word_before_last_bracket(query):
                     start_list.append(result_config)
@@ -169,16 +175,17 @@ class Query(Method):
             result_tcp_port = Result(Title='tcp-port',
                                      SubTitle="Start a TCP server on the given port to allow the direct sending of SocketMessages",
                                      AutoCompleteText="tcp-port",
-                                     JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "tcp-port [ "],
+                                     JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "tcp-port [ ", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
                                                                  dontHideAfterAction=True))
 
             if 'tcp-port' in query:
-                if re.search(r'\s+tcp-port\s*\[.*?\]', new_query):
-                    matches = re.search(r'\s+tcp-port\s*\[(.*?)\]', query)
-                    tcp_port = [matches.group(1).strip()]
-                    new_query = re.sub(r'\s+tcp-port\s*\[.*?\]', '', new_query)
+                if re.search(r'\btcp-port\s*\[.*?\]', new_query):
+                    matches = re.search(r'\btcp-port\s*\[(.*?)\]', query)
+                    tcp_port = [matches.group(1)]
+                    new_query = re.sub(r'\btcp-port\s*\[.*?\]', '', new_query)
+                    new_query = re.sub(r'\s+', ' ', new_query).strip()
                 else:
-                    new_query = new_query.replace(" tcp-port", "")
+                    new_query = new_query.strip().replace("tcp-port", "")
             else:
                 if not word_before_last_bracket(query):
                     start_list.append(result_tcp_port)
@@ -189,13 +196,13 @@ class Query(Method):
                 if word_before == "config":
                     matches = find_files_in_user_directory()
 
-                    new_query = new_query.replace(" [", "")
+                    new_query = new_query.strip().replace("[", "")
 
                     for match in matches:
                         match_result = Result(Title=match,
                                               AutoCompleteText=match,
                                               JsonRPCAction=JsonRPCAction(method="change",
-                                                                          parameters=[query, match + " ]"],
+                                                                          parameters=[query, match + " ]", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
                                                                           dontHideAfterAction=True))
 
                         start_list.append(match_result)
@@ -208,7 +215,7 @@ class Query(Method):
                         notdigit = Result(Title='Not a number needs to be a number')
                         self.add_result(notdigit)
 
-            rr = utils.score_results(new_query, start_list, match_on_empty_query=True)
+            rr = utils.score_results(new_query.strip(), start_list, match_on_empty_query=True)
 
             r = Result(Title='run',
                        SubTitle='run start command with this parameters')
@@ -250,7 +257,8 @@ class Query(Method):
 
         if first_word == "stop":
 
-            new_query = query.replace('stop', '')
+            new_query = query.strip().replace('stop', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
 
             whkd: bool = False
 
@@ -262,7 +270,9 @@ class Query(Method):
 
             if 'whkd' in query:
                 whkd = True
-                new_query = new_query.replace(" whkd", "")
+                new_query = new_query.strip().replace("whkd", "")
+                new_query = re.sub(r'\s+', ' ', new_query).strip()
+
             else:
                 if not word_before_last_bracket(query):
                     stop_list.append(result_whkd)
@@ -335,10 +345,10 @@ class Change(Method):
         super().__init__()
         self.settings = settings
 
-    def __call__(self, query, word_to_check) -> JsonRPCAction:
+    def __call__(self, query: str, word_to_check: str, stop_words: [str]) -> JsonRPCAction:
         query = "kc" + " " + query
 
-        return api.change_query(query=append_if_matches(query, word_to_check))
+        return api.change_query(query=append_if_matches(query, word_to_check, stop_words))
 
 
 class App_focus(Method):

@@ -1242,3 +1242,16 @@ class WKomorebic:
 
 if __name__ == "__main__":
     tkomo = WKomorebic()
+
+    import re
+
+
+    def normalize_whitespace(text):
+        # Use regular expression to replace multiple spaces with a single space
+        return re.sub(r'\s+', ' ', text).strip()
+
+
+    # Example usage
+    input_text = "This   is            a    string   with        extra        spaces."
+    normalized_text = normalize_whitespace(input_text)
+    print(normalized_text)

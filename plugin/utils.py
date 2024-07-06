@@ -203,13 +203,35 @@ def word_before_last_bracket(text):
     return words[-1] if words else None
 
 
-def append_if_matches(input_string, word_to_check):
+def append_if_matches(input_string: str, word_to_check: str, stop_words: [str]) -> str:
     words = input_string.split()
     if not words:
         return input_string  # If input_string is empty or only whitespace, return as is
 
     last_word = words[-1]
-    if word_to_check.startswith(last_word):
+    it = iter(word_to_check)
+    if all(char in it for char in last_word.lower()):
+        # Remove the last word from the input string
+        new_string = None
+
+        # Traverse the words from the end
+        for i in range(len(words) - 1, -1, -1):
+            word = words[i]
+
+            # Check if the current word is in the stop words list or contains a closing square bracket
+            for stop_word in stop_words:
+                if stop_word == word or ']' in word:
+                    # Join the remaining words to form the substring from this point onwards
+                    new_string = ' '.join(words[:i + 1])
+
+                    return f"{new_string.strip()} {word_to_check}".strip()
+        # Append word_to_check to the new string
+        if new_string is None:
+            # Remove the last word from the input string
+            new_string = ' '.join(words[:-1])
+            # Append word_to_check to the new string
+            return f"{new_string} {word_to_check}".strip()
+    elif word_to_check.startswith(last_word):
         # Find the part of word_to_check that is not in last_word
         remaining_part = word_to_check[len(last_word):]
         # Append the remaining part to the input string

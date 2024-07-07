@@ -1,18 +1,20 @@
+from pathlib import Path
 from typing import Optional, Iterable, Any
 import re, os, fnmatch
 from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils, icons, api
 from plugin.komorebic_client import WKomorebic
 from utils import state, score_resluts_with_sub, get_first_word, append_if_matches, word_before_last_bracket, \
-    find_files_in_user_directory
+    find_files_in_user_directory, extract_icon_from_running_process, IconSize, save_icon_as_png
 
 
 class Query(Method):
 
-    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+    def __init__(self, komorebic: WKomorebic, pipe, pipename, root_dir: Path):
         super().__init__()
         self.komorebic = komorebic
         self.pipe = pipe
         self.pipename = pipename
+        self.root_dir = root_dir
         self.functions_dict = {}
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
@@ -51,17 +53,38 @@ class Query(Method):
     def application_focus(self, query, state_j):
         application_list = []
 
-        for monitor in state_j['monitors']['elements']:
-            for workspace in monitor['workspaces']['elements']:
-                for container in workspace['containers']['elements']:
-                    for window in container['windows']['elements']:
-                        r = Result(
-                            Title=str(window['title']),
-                            SubTitle=f"EXE: {str(window['exe'])}, HWND: {str(window['hwnd'])}",
-                            JsonRPCAction=JsonRPCAction(method="app_focus",
-                                                        parameters=[str(window['exe']), int(window['hwnd'])]),
+        for i, monitor in enumerate(state_j['monitors']['elements']):
+            for j, workspace in enumerate(monitor['workspaces']['elements']):
+                for k, container in enumerate(workspace['containers']['elements']):
+                    for l, window in enumerate(container['windows']['elements']):
 
-                        )
+                        exe_path = "icons/" + window['exe'][:-4] + ".png"
+
+                        png_path = self.root_dir / exe_path
+                        if not os.path.exists(png_path):
+                            bits = extract_icon_from_running_process(window['exe'])
+                            icon_size = IconSize.LARGE
+                            w, h = IconSize.to_wh(icon_size)
+                            if bits:
+                                save_icon_as_png(bits, png_path, w, h)
+
+                        if os.path.exists(png_path):
+                            r = Result(
+                                Title=str(window['title']),
+                                SubTitle=f"EXE: {str(window['exe'])}, HWND: {str(window['hwnd'])}, MONITOR: {str(i+1)}, WORKSPACE: {str(j+1)}",
+                                IcoPath=png_path.__str__(),
+                                JsonRPCAction=JsonRPCAction(method="app_focus",
+                                                            parameters=[str(window['exe']), int(window['hwnd'])]),
+                            )
+                        else:
+                            r = Result(
+                                Title=str(window['title']),
+                                SubTitle=f"EXE: {str(window['exe'])}, HWND: {str(window['hwnd'])}, MONITOR: {str(i + 1)}, WORKSPACE: {str(j + 1)}",
+                                JsonRPCAction=JsonRPCAction(method="app_focus",
+                                                            parameters=[str(window['exe']), int(window['hwnd'])]),
+
+                            )
+
                         application_list.append(r)
 
         scored_results = score_resluts_with_sub(query, application_list)
@@ -100,7 +123,11 @@ class Query(Method):
             result_ffm = Result(Title='ffm',
                                 SubTitle="Allow the use of komorebi's custom focus-follows-mouse implementation",
                                 AutoCompleteText="ffm",
-                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ffm", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
+                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ffm", ['ffm', 'config',
+                                                                                                        'await-configuration',
+                                                                                                        'tcp-port',
+                                                                                                        'whkd', 'ahk',
+                                                                                                        'start']],
                                                             dontHideAfterAction=True))
 
             if 'ffm' in query:
@@ -115,7 +142,11 @@ class Query(Method):
                                                 SubTitle="Wait for 'komorebic complete-configuration' to be sent before processing events",
                                                 AutoCompleteText="await-configuration",
                                                 JsonRPCAction=JsonRPCAction(method="change",
-                                                                            parameters=[query, "await-configuration", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
+                                                                            parameters=[query, "await-configuration",
+                                                                                        ['ffm', 'config',
+                                                                                         'await-configuration',
+                                                                                         'tcp-port', 'whkd', 'ahk',
+                                                                                         'start']],
                                                                             dontHideAfterAction=True))
 
             if 'await-configuration' in query:
@@ -129,7 +160,11 @@ class Query(Method):
             result_whkd = Result(Title='whkd',
                                  SubTitle="Start whkd in a background process",
                                  AutoCompleteText="whkd",
-                                 JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
+                                 JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd",
+                                                                                          ['ffm', 'config',
+                                                                                           'await-configuration',
+                                                                                           'tcp-port', 'whkd', 'ahk',
+                                                                                           'start']],
                                                              dontHideAfterAction=True))
 
             if 'whkd' in query:
@@ -143,7 +178,11 @@ class Query(Method):
             result_ahk = Result(Title='ahk',
                                 SubTitle="Start autohotkey configuration file",
                                 AutoCompleteText="ahk",
-                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ahk", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
+                                JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "ahk", ['ffm', 'config',
+                                                                                                        'await-configuration',
+                                                                                                        'tcp-port',
+                                                                                                        'whkd', 'ahk',
+                                                                                                        'start']],
                                                             dontHideAfterAction=True))
 
             if 'ahk' in query:
@@ -157,7 +196,11 @@ class Query(Method):
             result_config = Result(Title='config',
                                    SubTitle="Path to a static configuration JSON file",
                                    AutoCompleteText="config",
-                                   JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "config [ ", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
+                                   JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "config [ ",
+                                                                                            ['ffm', 'config',
+                                                                                             'await-configuration',
+                                                                                             'tcp-port', 'whkd', 'ahk',
+                                                                                             'start']],
                                                                dontHideAfterAction=True))
 
             if ' config ' in query:
@@ -175,7 +218,11 @@ class Query(Method):
             result_tcp_port = Result(Title='tcp-port',
                                      SubTitle="Start a TCP server on the given port to allow the direct sending of SocketMessages",
                                      AutoCompleteText="tcp-port",
-                                     JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "tcp-port [ ", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
+                                     JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "tcp-port [ ",
+                                                                                              ['ffm', 'config',
+                                                                                               'await-configuration',
+                                                                                               'tcp-port', 'whkd',
+                                                                                               'ahk', 'start']],
                                                                  dontHideAfterAction=True))
 
             if 'tcp-port' in query:
@@ -202,7 +249,11 @@ class Query(Method):
                         match_result = Result(Title=match,
                                               AutoCompleteText=match,
                                               JsonRPCAction=JsonRPCAction(method="change",
-                                                                          parameters=[query, match + " ]", ['ffm', 'config', 'await-configuration', 'tcp-port', 'whkd', 'ahk', 'start']],
+                                                                          parameters=[query, match + " ]",
+                                                                                      ['ffm', 'config',
+                                                                                       'await-configuration',
+                                                                                       'tcp-port', 'whkd', 'ahk',
+                                                                                       'start']],
                                                                           dontHideAfterAction=True))
 
                         start_list.append(match_result)
@@ -265,7 +316,7 @@ class Query(Method):
             result_whkd = Result(Title='whkd',
                                  SubTitle="Start whkd in a background process",
                                  AutoCompleteText="whkd",
-                                 JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd"],
+                                 JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd", ["stop", "whkd"]],
                                                              dontHideAfterAction=True))
 
             if 'whkd' in query:
@@ -324,7 +375,35 @@ class Query(Method):
         for scored_results in rr:
             self.add_result(scored_results)
 
+    def state(self, query: str, state_j):
+        r = Result(Title='state',
+                   SubTitle='Show a JSON representation of the current window manager state',
+                   JsonRPCAction=JsonRPCAction(method="state", parameters=[]))
 
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+    def global_state(self, query: str, state_j):
+        r = Result(Title='global-state',
+                   SubTitle='Show a JSON representation of the current global state',
+                   JsonRPCAction=JsonRPCAction(method="global_state", parameters=[]))
+
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+    def gui(self, query: str, state_j):
+        r = Result(Title='gui',
+                   SubTitle='Launch the komorebi-gui debugging tool',
+                   JsonRPCAction=JsonRPCAction(method="gui", parameters=[]))
+
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
 
 
 class Context_menu(Method):
@@ -412,7 +491,7 @@ class Check(Method):
     def __call__(self) -> JsonRPCAction:
         result = self.komorebic.check()
 
-        return api.copy_to_clipboard(str(result.stdout))
+        return api.copy_to_clipboard(result.stdout)
 
 
 class Configuration(Method):
@@ -426,7 +505,7 @@ class Configuration(Method):
     def __call__(self) -> JsonRPCAction:
         result = self.komorebic.configuration()
 
-        return api.copy_to_clipboard(str(result.stdout))
+        return api.copy_to_clipboard(result.stdout)
 
 
 class Whkdrc(Method):
@@ -440,4 +519,44 @@ class Whkdrc(Method):
     def __call__(self) -> JsonRPCAction:
         result = self.komorebic.whkdrc()
 
-        return api.copy_to_clipboard(str(result.stdout))
+        return api.copy_to_clipboard(result.stdout)
+
+
+class State(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self) -> JsonRPCAction:
+        result = self.komorebic.state()
+
+        return api.copy_to_clipboard(result.stdout)
+
+
+class Global_state(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self) -> JsonRPCAction:
+        result = self.komorebic.global_state()
+
+        return api.copy_to_clipboard(result.stdout)
+
+
+class Gui(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self):
+        self.komorebic.gui()

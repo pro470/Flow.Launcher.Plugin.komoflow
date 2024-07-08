@@ -46,10 +46,7 @@ def extract_commands_and_arguments(help_output):
             option_name = re.search(r'--([\w-]+)', line).group(1)
             option_name = option_name.replace("-", "_")
             option_arguments = re.findall(r'<(.*?)>', line)
-            if option_name == 'await':
-                options[current_command].append({'await-configuration': option_arguments})
-            else:
-                options[current_command].append({option_name: option_arguments})
+            options[current_command].append({option_name: option_arguments})
 
     return commands, arguments, options
 

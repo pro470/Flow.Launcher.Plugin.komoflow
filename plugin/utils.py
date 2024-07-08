@@ -1,11 +1,13 @@
 import json
 import logging
+import platform
 import subprocess
 import struct
 import time
 import os
 import ctypes
 from ctypes import wintypes
+
 from pyflowlauncher import Result, string_matcher
 from typing import Iterable, Generator, Optional
 from komorebic_client import WKomorebic
@@ -533,3 +535,87 @@ def save_icon_as_png(icon_bytes, icon_path, width, height):
         # IEND chunk
         f.write(png_chunk(b'IEND', b''))
 
+
+def query_windows_search(search_term):
+    # Construct the PowerShell command
+    ps_command = [
+        "pwsh.exe",  # Use 'powershell.exe' to directly call the executable
+        "-NoProfile",  # Run without profile
+        "-ExecutionPolicy", "Bypass",  # Bypass the execution policy
+        "-File", "plugin\windows_index.ps1",  # Path to the PowerShell script
+        "-searchTerm", search_term  # Pass the search term parameter
+    ]
+
+    result = subprocess.run(ps_command, capture_output=True, text=True, encoding='utf-8', shell=True)
+
+    # Check for errors in the subprocess execution
+    if result.returncode != 0:
+        raise Exception(f"Error executing PowerShell script: {result.stderr}")
+
+    # Parse the JSON output
+    # Read and parse the JSON output from the file
+    with open("output.json", "r", encoding='utf-8') as file:
+        results = json.load(file)
+
+    return results
+
+
+def everything_search(search_terms: str):
+    # defines
+    EVERYTHING_REQUEST_FILE_NAME = 0x00000001
+    EVERYTHING_REQUEST_PATH = 0x00000002
+    EVERYTHING_REQUEST_FULL_PATH_AND_FILE_NAME = 0x00000004
+    EVERYTHING_REQUEST_EXTENSION = 0x00000008
+    EVERYTHING_REQUEST_SIZE = 0x00000010
+    EVERYTHING_REQUEST_DATE_CREATED = 0x00000020
+    EVERYTHING_REQUEST_DATE_MODIFIED = 0x00000040
+    EVERYTHING_REQUEST_DATE_ACCESSED = 0x00000080
+    EVERYTHING_REQUEST_ATTRIBUTES = 0x00000100
+    EVERYTHING_REQUEST_FILE_LIST_FILE_NAME = 0x00000200
+    EVERYTHING_REQUEST_RUN_COUNT = 0x00000400
+    EVERYTHING_REQUEST_DATE_RUN = 0x00000800
+    EVERYTHING_REQUEST_DATE_RECENTLY_CHANGED = 0x00001000
+    EVERYTHING_REQUEST_HIGHLIGHTED_FILE_NAME = 0x00002000
+    EVERYTHING_REQUEST_HIGHLIGHTED_PATH = 0x00004000
+    EVERYTHING_REQUEST_HIGHLIGHTED_FULL_PATH_AND_FILE_NAME = 0x00008000
+
+    # Get the system architecture
+    arch = platform.architecture()[0]
+    try:
+        # Check if the architecture is 64-bit or 32-bit
+        if arch == "64bit":
+            everything_dll = ctypes.WinDLL(".\\Everything-SDK\\DLL\\Everything64.dll", use_last_error=True)
+        elif arch == "32bit":
+            everything_dll = ctypes.WinDLL(".\\Everything-SDK\\DLL\\Everything32.dll", use_last_error=True)
+    except Exception:
+        return None
+
+    # dll imports
+    everything_dll.Everything_GetResultDateModified.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_ulonglong)]
+    everything_dll.Everything_GetResultSize.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_ulonglong)]
+    everything_dll.Everything_GetResultFileNameW.argtypes = [ctypes.c_int]
+    everything_dll.Everything_GetResultFileNameW.restype = ctypes.c_wchar_p
+
+    # setup search
+    everything_dll.Everything_SetSearchW(search_terms)
+    everything_dll.Everything_SetRequestFlags(
+        EVERYTHING_REQUEST_FILE_NAME | EVERYTHING_REQUEST_PATH | EVERYTHING_REQUEST_SIZE | EVERYTHING_REQUEST_DATE_MODIFIED)
+
+    # execute the query
+    everything_dll.Everything_QueryW(1)
+
+    # get the number of results
+    num_results = everything_dll.Everything_GetNumResults()
+
+    # create buffers
+    filename = ctypes.create_unicode_buffer(260)
+
+    everything_result = []
+
+    # show results
+    for i in range(num_results):
+        everything_dll.Everything_GetResultFullPathNameW(i, filename, 260)
+        filenamestr = "{}".format(ctypes.wstring_at(filename))
+        everything_result.append(filenamestr)
+
+    return everything_result

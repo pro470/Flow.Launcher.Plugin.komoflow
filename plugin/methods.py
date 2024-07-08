@@ -1,10 +1,12 @@
+import subprocess
 from pathlib import Path
 from typing import Optional, Iterable, Any
 import re, os, fnmatch
 from pyflowlauncher import Method, ResultResponse, Result, shared, JsonRPCAction, string_matcher, utils, icons, api
 from plugin.komorebic_client import WKomorebic
 from utils import state, score_resluts_with_sub, get_first_word, append_if_matches, word_before_last_bracket, \
-    find_files_in_user_directory, extract_icon_from_running_process, IconSize, save_icon_as_png
+    find_files_in_user_directory, extract_icon_from_running_process, IconSize, save_icon_as_png, query_windows_search, \
+    everything_search
 
 
 class Query(Method):
@@ -71,7 +73,7 @@ class Query(Method):
                         if os.path.exists(png_path):
                             r = Result(
                                 Title=str(window['title']),
-                                SubTitle=f"EXE: {str(window['exe'])}, HWND: {str(window['hwnd'])}, MONITOR: {str(i+1)}, WORKSPACE: {str(j+1)}",
+                                SubTitle=f"EXE: {str(window['exe'])}, HWND: {str(window['hwnd'])}, MONITOR: {str(i + 1)}, WORKSPACE: {str(j + 1)}",
                                 IcoPath=png_path.__str__(),
                                 JsonRPCAction=JsonRPCAction(method="app_focus",
                                                             parameters=[str(window['exe']), int(window['hwnd'])]),
@@ -241,22 +243,67 @@ class Query(Method):
                 word_before = word_before_last_bracket(query)
 
                 if word_before == "config":
-                    matches = find_files_in_user_directory()
 
                     new_query = new_query.strip().replace("[", "")
+                    new_query = re.sub(r'\s+', ' ', new_query).strip()
 
-                    for match in matches:
-                        match_result = Result(Title=match,
-                                              AutoCompleteText=match,
-                                              JsonRPCAction=JsonRPCAction(method="change",
-                                                                          parameters=[query, match + " ]",
-                                                                                      ['ffm', 'config',
-                                                                                       'await-configuration',
-                                                                                       'tcp-port', 'whkd', 'ahk',
-                                                                                       'start']],
-                                                                          dontHideAfterAction=True))
+                    if new_query == "":
+                        everything_matches = everything_search("komorebi.json")
+                    else:
+                        everything_matches = everything_search(new_query)
 
-                        start_list.append(match_result)
+                    if everything_matches:
+                        for match in everything_matches:
+                            match_result = Result(Title=match,
+                                                  AutoCompleteText=match,
+                                                  JsonRPCAction=JsonRPCAction(method="change",
+                                                                              parameters=[query, match + " ]",
+                                                                                          ['ffm', 'config',
+                                                                                           'await-configuration',
+                                                                                           'tcp-port', 'whkd', 'ahk',
+                                                                                           'start']],
+                                                                              dontHideAfterAction=True))
+
+                            start_list.append(match_result)
+                    else:
+
+                        if new_query == "":
+
+                            matches = query_windows_search("komorebi.json")
+
+                        else:
+                            matches = query_windows_search(new_query)
+
+                        if isinstance(matches, list):
+
+                            for match in matches:
+                                match_result = Result(Title=match['SYSTEM.ITEMPATHDISPLAY'],
+                                                      AutoCompleteText=match['SYSTEM.ITEMPATHDISPLAY'],
+                                                      JsonRPCAction=JsonRPCAction(method="change",
+                                                                                  parameters=[query, match[
+                                                                                      'SYSTEM.ITEMPATHDISPLAY'] + " ]",
+                                                                                              ['ffm', 'config',
+                                                                                               'await-configuration',
+                                                                                               'tcp-port', 'whkd',
+                                                                                               'ahk',
+                                                                                               'start']],
+                                                                                  dontHideAfterAction=True))
+
+                            start_list.append(match_result)
+                        else:
+                            match_result = Result(Title=matches['SYSTEM.ITEMPATHDISPLAY'],
+                                                  AutoCompleteText=matches['SYSTEM.ITEMPATHDISPLAY'],
+                                                  JsonRPCAction=JsonRPCAction(method="change",
+                                                                              parameters=[query, matches[
+                                                                                  'SYSTEM.ITEMPATHDISPLAY'] + " ]",
+                                                                                          ['ffm', 'config',
+                                                                                           'await-configuration',
+                                                                                           'tcp-port', 'whkd', 'ahk',
+                                                                                           'start']],
+                                                                              dontHideAfterAction=True))
+
+                            start_list.append(match_result)
+
 
                 elif word_before == "tcp-port":
 
@@ -316,7 +363,8 @@ class Query(Method):
             result_whkd = Result(Title='whkd',
                                  SubTitle="Start whkd in a background process",
                                  AutoCompleteText="whkd",
-                                 JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "whkd", ["stop", "whkd"]],
+                                 JsonRPCAction=JsonRPCAction(method="change",
+                                                             parameters=[query, "whkd", ["stop", "whkd"]],
                                                              dontHideAfterAction=True))
 
             if 'whkd' in query:
@@ -399,6 +447,352 @@ class Query(Method):
         r = Result(Title='gui',
                    SubTitle='Launch the komorebi-gui debugging tool',
                    JsonRPCAction=JsonRPCAction(method="gui", parameters=[]))
+
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+    def visible_windows(self, query: str, state_j):
+
+        visible_windows_list = []
+
+        first_word = get_first_word(query)
+
+        if first_word == 'visible-windows':
+
+            new_query = query.strip().replace('visible-windows', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+            for i, monitor in enumerate(state_j['monitors']['elements']):
+                monitor_result = Result(Title=monitor['device_id'],
+                                        SubTitle=f"name: {monitor['name']} divice: {monitor['device']}",
+                                        JsonRPCAction=JsonRPCAction(method="change",
+                                                                    parameters=[query, monitor['device'],
+                                                                                ['visible-windows']],
+                                                                    dontHideAfterAction=True))
+                visible_windows_list.append(monitor_result)
+                focused_w_index = monitor['workspaces']['focused']
+                focused_workspace = monitor['workspaces']['elements'][focused_w_index]
+                for k, container in enumerate(focused_workspace['containers']['elements']):
+                    for l, window in enumerate(container['windows']['elements']):
+
+                        exe_path = "icons/" + window['exe'][:-4] + ".png"
+
+                        png_path = self.root_dir / exe_path
+                        if not os.path.exists(png_path):
+                            bits = extract_icon_from_running_process(window['exe'])
+                            icon_size = IconSize.LARGE
+                            w, h = IconSize.to_wh(icon_size)
+                            if bits:
+                                save_icon_as_png(bits, png_path, w, h)
+
+                        json_window = f'''{{
+    "title": "{window['title']}",
+    "exe": "{window['exe']}",
+    "class": "{window['class']}"
+}}'''
+
+                        if os.path.exists(png_path):
+                            r = Result(
+                                Title=window['title'] + ' - ' + f"name: {monitor['name']} divice: {monitor['device']}",
+                                SubTitle=f"EXE: {str(window['exe'])}, MONITOR: {str(i + 1)}, WORKSPACE: {str(focused_w_index + 1)}, CLASS: {str(window['class'])}",
+                                IcoPath=png_path.__str__(),
+                                JsonRPCAction=JsonRPCAction(method="copy_to_clipboard",
+                                                            parameters=[json_window]),
+                            )
+                        else:
+                            r = Result(
+                                Title=window['title'] + f"name: {monitor['name']} divice: {monitor['device']}",
+                                SubTitle=f"EXE: {str(window['exe'])}, MONITOR: {str(i + 1)}, WORKSPACE: {str(focused_w_index + 1)}, CLASS: {str(window['class'])}",
+                                JsonRPCAction=JsonRPCAction(method="copy_to_clipboard",
+                                                            parameters=[json_window]),
+
+                            )
+
+                        visible_windows_list.append(r)
+
+            run = Result(Title='copy to clipboard (all)',
+                         SubTitle='Show a JSON representation of visible windows',
+                         JsonRPCAction=JsonRPCAction(method="visible_windows", parameters=[]))
+
+            rr = utils.score_results(new_query, visible_windows_list, match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+            self.add_result(run)
+
+
+
+
+        else:
+            r = Result(Title='visible-windows',
+                       SubTitle='Show a JSON representation of visible windows',
+                       JsonRPCAction=JsonRPCAction(method="visible_windows", parameters=[]))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+    def monitor_information(self, query: str, state_j):
+
+        monitor_information_list = []
+
+        first_word = get_first_word(query)
+
+        if first_word == 'monitor-information':
+
+            new_query = query.strip().replace('monitor-information', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+            for i, monitor in enumerate(state_j['monitors']['elements']):
+                json_window = f'''{{
+    "{monitor['device_id']}": {{
+        "left": {monitor['size']['left']},
+        "top": {monitor['size']['top']},
+        "right": {monitor['size']['right']},
+        "bottom": {monitor['size']['bottom']} 
+    }}
+}}'''
+
+                monitor_result = Result(Title=monitor['device_id'],
+                                        SubTitle=f"name: {monitor['name']} divice: {monitor['device']}",
+                                        JsonRPCAction=JsonRPCAction(method="copy_to_clipboard",
+                                                                    parameters=[json_window]))
+                monitor_information_list.append(monitor_result)
+
+            run = Result(Title='copy to clipboard (all)',
+                         SubTitle='Show information about connected monitors',
+                         JsonRPCAction=JsonRPCAction(method="monitor_information", parameters=[]))
+
+            rr = utils.score_results(new_query, monitor_information_list, match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+            self.add_result(run)
+        else:
+            r = Result(Title='monitor-information',
+                       SubTitle='Show information about connected monitors',
+                       JsonRPCAction=JsonRPCAction(method="monitor_information", parameters=[]))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+    def query(self, query: str, state_j):
+
+        query_list = []
+
+        first_word = get_first_word(query)
+
+        if first_word == "query":
+
+            new_query = query.strip().replace('query', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+            fmi_result = Result(Title="focused-monitor-index",
+                                SubTitle="",
+                                JsonRPCAction=JsonRPCAction(method="state_query",
+                                                            parameters=['focused-monitor-index']))
+
+            fwi_result = Result(Title="focused-workspace-index",
+                                SubTitle="",
+                                JsonRPCAction=JsonRPCAction(method="state_query",
+                                                            parameters=['focused-workspace-index']))
+
+            fci_result = Result(Title="focused-container-index",
+                                SubTitle="",
+                                JsonRPCAction=JsonRPCAction(method="state_query",
+                                                            parameters=['focused-container-index']))
+
+            fwwi_result = Result(Title="focused-window-index",
+                                 SubTitle="",
+                                 JsonRPCAction=JsonRPCAction(method="state_query",
+                                                             parameters=['focused-window-index']))
+
+            query_list.append(fmi_result)
+            query_list.append(fwi_result)
+            query_list.append(fci_result)
+            query_list.append(fwwi_result)
+
+            rr = utils.score_results(new_query, query_list, match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+        else:
+            r = Result(Title="query",
+                       SubTitle="Query the current window manager state",
+                       JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "query", ["query"]],
+                                                   dontHideAfterAction=True))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+    def subscribe_socket(self, query: str, state_j):
+
+        first_word = get_first_word(query)
+
+        if first_word == 'subscribe-socket':
+
+            new_query = query.strip().replace('subscribe-socket', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+            if re.search(r'\s+', new_query):
+
+                r = Result(Title="need to provide only one word")
+                self._results = [r]
+            else:
+                r = Result(Title="run",
+                           SubTitle="Subscribe to komorebi events using a Unix Domain Socket",
+                           JsonRPCAction=JsonRPCAction(method='subscribe-socket', parameters=[new_query])
+                           )
+
+                self.add_result(r)
+
+        else:
+            r = Result(Title='subscribe-socket',
+                       SubTitle="Subscribe to komorebi events using a Unix Domain Socket",
+                       JsonRPCAction=JsonRPCAction(method="change",
+                                                   parameters=[query, 'subscribe-socket', ['subscribe-socket']],
+                                                   dontHideAfterAction=True))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+    def unsubscribe_socket(self, query: str, state_j):
+
+        first_word = get_first_word(query)
+
+        if first_word == 'unsubscribe-socket':
+
+            new_query = query.strip().replace('unsubscribe-socket', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+            if re.search(r'\s+', new_query):
+
+                r = Result(Title="need to provide only one word")
+                self._results = [r]
+            else:
+                r = Result(Title="run",
+                           SubTitle="Unsubscribe from komorebi events",
+                           JsonRPCAction=JsonRPCAction(method='unsubscribe-socket', parameters=[new_query])
+                           )
+
+                self.add_result(r)
+
+        else:
+            r = Result(Title='unsubscribe-socket',
+                       SubTitle="Unsubscribe from komorebi events",
+                       JsonRPCAction=JsonRPCAction(method="change",
+                                                   parameters=[query, 'unsubscribe-socket', ['unsubscribe-socket']],
+                                                   dontHideAfterAction=True))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)  #
+
+    def subscribe_pipe(self, query: str, state_j):
+
+        first_word = get_first_word(query)
+
+        if first_word == 'subscribe-pipe':
+
+            new_query = query.strip().replace('subscribe-pipe', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+            if re.search(r'\s+', new_query):
+
+                r = Result(Title="need to provide only one word")
+                self._results = [r]
+            else:
+                r = Result(Title="run",
+                           SubTitle="Subscribe to komorebi events using a Named Pipe",
+                           JsonRPCAction=JsonRPCAction(method='subscribe-pipe', parameters=[new_query])
+                           )
+
+                self.add_result(r)
+
+        else:
+            r = Result(Title='subscribe-pipe',
+                       SubTitle="Subscribe to komorebi events using a Named Pipe",
+                       JsonRPCAction=JsonRPCAction(method="change",
+                                                   parameters=[query, 'subscribe-pipe', ['subscribe-pipe']],
+                                                   dontHideAfterAction=True))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+    def unsubscribe_pipe(self, query: str, state_j):
+
+        first_word = get_first_word(query)
+
+        if first_word == 'unsubscribe-pipe':
+
+            new_query = query.strip().replace('unsubscribe-pipe', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+            if re.search(r'\s+', new_query):
+
+                r = Result(Title="need to provide only one word")
+                self._results = [r]
+            else:
+                r = Result(Title="run",
+                           SubTitle="Unsubscribe from komorebi events",
+                           JsonRPCAction=JsonRPCAction(method='unsubscribe-pipe', parameters=[new_query])
+                           )
+
+                self.add_result(r)
+
+        else:
+            r = Result(Title='unsubscribe-pipe',
+                       SubTitle="Unsubscribe from komorebi events",
+                       JsonRPCAction=JsonRPCAction(method="change",
+                                                   parameters=[query, 'unsubscribe-pipe', ['unsubscribe-pipe']],
+                                                   dontHideAfterAction=True))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+    def log(self, query: str, state_j):
+
+        r = Result(Title="log",
+                   SubTitle="Tail komorebi.exe's process logs (cancel with Ctrl-C)",
+                   JsonRPCAction=JsonRPCAction(method="log", parameters=[]))
+
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+    def quick_save_resize(self, query: str, state_j):
+
+        r = Result(Title="quick-save-resize",
+                   SubTitle="Quicksave the current resize layout dimensions",
+                   JsonRPCAction=JsonRPCAction(method="quick_save_resize", parameters=[]))
+
+        rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+        for scored_results in rr:
+            self.add_result(scored_results)
+
+    def quick_load_resize(self, query: str, state_j):
+
+        r = Result(Title="quick-load-resize",
+                   SubTitle="Load the last quicksaved resize layout dimensions",
+                   JsonRPCAction=JsonRPCAction(method="quick_load_resize", parameters=[]))
 
         rr = utils.score_results(query, [r], match_on_empty_query=True)
 
@@ -560,3 +954,141 @@ class Gui(Method):
 
     def __call__(self):
         self.komorebic.gui()
+
+
+class Visible_windows(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self) -> JsonRPCAction:
+        result = self.komorebic.visible_windows()
+
+        return api.copy_to_clipboard(result.stdout)
+
+
+class Copy_to_clipboard(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, text_to_copy) -> JsonRPCAction:
+        return api.copy_to_clipboard(text_to_copy)
+
+
+class Monitor_information(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self) -> JsonRPCAction:
+        result = self.komorebic.monitor_information()
+
+        return api.copy_to_clipboard(result.stdout)
+
+
+class State_query(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, state_q: str) -> JsonRPCAction:
+        result = self.komorebic.query(state_q)
+
+        return api.copy_to_clipboard(result.stdout)
+
+
+class Subscribe_socket(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, socket: str):
+        self.komorebic.subscribe_socket(socket)
+
+
+class Unsubscribe_socket(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, socket: str):
+        self.komorebic.unsubscribe_socket(socket)
+
+
+class Subscribe_pipe(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, named_pipe: str):
+        self.komorebic.subscribe_pipe(named_pipe)
+
+
+class Unsubscribe_pipe(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, named_pipe: str):
+        self.komorebic.unsubscribe_pipe(named_pipe)
+
+
+class Log(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self):
+        subprocess.run(['start', 'cmd', '/k', self.komorebic.path, 'log'], shell=True)
+
+
+class Quick_save_resize(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self):
+        self.komorebic.quick_save_resize()
+
+
+class Quick_load_resize(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self):
+        self.komorebic.quick_load_resize()

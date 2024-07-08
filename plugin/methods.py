@@ -261,7 +261,7 @@ class Query(Method):
                                                                                           ['ffm', 'config',
                                                                                            'await-configuration',
                                                                                            'tcp-port', 'whkd', 'ahk',
-                                                                                           'start']],
+                                                                                           'start', '[']],
                                                                               dontHideAfterAction=True))
 
                             start_list.append(match_result)
@@ -286,23 +286,24 @@ class Query(Method):
                                                                                                'await-configuration',
                                                                                                'tcp-port', 'whkd',
                                                                                                'ahk',
-                                                                                               'start']],
+                                                                                               'start', '[']],
                                                                                   dontHideAfterAction=True))
 
-                            start_list.append(match_result)
+                                start_list.append(match_result)
                         else:
-                            match_result = Result(Title=matches['SYSTEM.ITEMPATHDISPLAY'],
-                                                  AutoCompleteText=matches['SYSTEM.ITEMPATHDISPLAY'],
-                                                  JsonRPCAction=JsonRPCAction(method="change",
-                                                                              parameters=[query, matches[
-                                                                                  'SYSTEM.ITEMPATHDISPLAY'] + " ]",
-                                                                                          ['ffm', 'config',
-                                                                                           'await-configuration',
-                                                                                           'tcp-port', 'whkd', 'ahk',
-                                                                                           'start']],
-                                                                              dontHideAfterAction=True))
+                            if matches:
+                                match_result = Result(Title=matches['SYSTEM.ITEMPATHDISPLAY'],
+                                                      AutoCompleteText=matches['SYSTEM.ITEMPATHDISPLAY'],
+                                                      JsonRPCAction=JsonRPCAction(method="change",
+                                                                                  parameters=[query, matches[
+                                                                                      'SYSTEM.ITEMPATHDISPLAY'] + " ]",
+                                                                                              ['ffm', 'config',
+                                                                                               'await-configuration',
+                                                                                               'tcp-port', 'whkd', 'ahk',
+                                                                                               'start', '[']],
+                                                                                  dontHideAfterAction=True))
 
-                            start_list.append(match_result)
+                                start_list.append(match_result)
 
 
                 elif word_before == "tcp-port":

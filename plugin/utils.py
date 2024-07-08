@@ -554,8 +554,13 @@ def query_windows_search(search_term):
 
     # Parse the JSON output
     # Read and parse the JSON output from the file
-    with open("output.json", "r", encoding='utf-8') as file:
-        results = json.load(file)
+    file_path = "output.json"
+    # Check if the file exists and has content
+    if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
+        with open(file_path, "r", encoding='utf-8') as file:
+            results = json.load(file)
+    else:
+        results = None
 
     return results
 

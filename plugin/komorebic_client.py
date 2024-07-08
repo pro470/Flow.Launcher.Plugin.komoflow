@@ -194,7 +194,7 @@ class WKomorebic:
     def display_monitor_workspace(self, MONITOR, WORKSPACE) -> CompletedProcess[str]:
         cmd = [self.path, 'display-monitor-workspace', MONITOR, WORKSPACE]
         result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True, 
+                                            shell=True,
                                             capture_output=True,
                                             text=True) 
         return result 

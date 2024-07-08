@@ -244,9 +244,9 @@ def append_if_matches(input_string: str, word_to_check: str, stop_words: [str]) 
     if not words:
         return input_string  # If input_string is empty or only whitespace, return as is
 
-    last_word = words[-1]
-    it = iter(word_to_check)
-    if all(char in it for char in last_word.lower()):
+    last_word = words[-1].lower()
+    it = iter(word_to_check.lower())
+    if all(char in it for char in last_word) or '\\' in word_to_check or '/' in word_to_check:
         # Remove the last word from the input string
         new_string = None
 

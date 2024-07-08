@@ -208,7 +208,7 @@ class Query(Method):
             if ' config ' in query:
                 if re.search(r'\bconfig\s*\[.*?\]', new_query):
                     matches = re.search(r'\bconfig\s*\[(.*?)\]', query)
-                    config = [matches.group(1)]
+                    config = [matches.group(1).strip()]
                     new_query = re.sub(r'\bconfig\b\s*\[.*?\]', '', new_query)
                     new_query = re.sub(r'\s+', ' ', new_query).strip()
                 else:
@@ -230,7 +230,7 @@ class Query(Method):
             if 'tcp-port' in query:
                 if re.search(r'\btcp-port\s*\[.*?\]', new_query):
                     matches = re.search(r'\btcp-port\s*\[(.*?)\]', query)
-                    tcp_port = [matches.group(1)]
+                    tcp_port = [matches.group(1).strip()]
                     new_query = re.sub(r'\btcp-port\s*\[.*?\]', '', new_query)
                     new_query = re.sub(r'\s+', ' ', new_query).strip()
                 else:
@@ -299,12 +299,12 @@ class Query(Method):
                                                                                       'SYSTEM.ITEMPATHDISPLAY'] + " ]",
                                                                                               ['ffm', 'config',
                                                                                                'await-configuration',
-                                                                                               'tcp-port', 'whkd', 'ahk',
+                                                                                               'tcp-port', 'whkd',
+                                                                                               'ahk',
                                                                                                'start', '[']],
                                                                                   dontHideAfterAction=True))
 
                                 start_list.append(match_result)
-
 
                 elif word_before == "tcp-port":
 
@@ -342,8 +342,7 @@ class Query(Method):
         config_path = re.search(r'\s+config\s*\[(.*?)\]', query)
         if config_path:
             if not os.path.exists(config_path.group(1).strip()):
-                if not config_path.group(1).strip().endswith('komorebi.json'):
-                    self._results = [Result(Title='Path dont exits or is not a komorebi.json path')]
+                self._results = [Result(Title='Path dont exits')]
 
     def stop(self, query: str, state_j):
 
@@ -648,6 +647,9 @@ class Query(Method):
 
                 r = Result(Title="need to provide only one word")
                 self._results = [r]
+            elif '' == new_query:
+                r = Result(Title="Need to provide a name")
+                self._results = [r]
             else:
                 r = Result(Title="run",
                            SubTitle="Subscribe to komorebi events using a Unix Domain Socket",
@@ -681,6 +683,9 @@ class Query(Method):
 
                 r = Result(Title="need to provide only one word")
                 self._results = [r]
+            elif '' == new_query:
+                r = Result(Title="Need to provide a name")
+                self._results = [r]
             else:
                 r = Result(Title="run",
                            SubTitle="Unsubscribe from komorebi events",
@@ -699,7 +704,7 @@ class Query(Method):
             rr = utils.score_results(query, [r], match_on_empty_query=True)
 
             for scored_results in rr:
-                self.add_result(scored_results)  #
+                self.add_result(scored_results)
 
     def subscribe_pipe(self, query: str, state_j):
 
@@ -713,6 +718,9 @@ class Query(Method):
             if re.search(r'\s+', new_query):
 
                 r = Result(Title="need to provide only one word")
+                self._results = [r]
+            elif '' == new_query:
+                r = Result(Title="Need to provide a name")
                 self._results = [r]
             else:
                 r = Result(Title="run",
@@ -746,6 +754,10 @@ class Query(Method):
             if re.search(r'\s+', new_query):
 
                 r = Result(Title="need to provide only one word")
+                self._results = [r]
+
+            elif '' == new_query:
+                r = Result(Title="Need to provide a name")
                 self._results = [r]
             else:
                 r = Result(Title="run",
@@ -799,6 +811,458 @@ class Query(Method):
 
         for scored_results in rr:
             self.add_result(scored_results)
+
+    def save_resize(self, query: str, state_j):
+
+        save_resize_list = []
+
+        first_word = get_first_word(query)
+
+        if first_word == 'save-resize':
+
+            save_resize = ''
+
+            new_query = re.sub(r'\s+', ' ', query).strip()
+
+            result_save_resize = Result(Title='save-resize',
+                                        SubTitle="Save the current resize layout dimensions to a file",
+                                        AutoCompleteText="save-resize",
+                                        JsonRPCAction=JsonRPCAction(method="change",
+                                                                    parameters=[query, "save-resize [ ",
+                                                                                ['save-resize', "["]],
+                                                                    dontHideAfterAction=True))
+
+            if 'save-resize' in query:
+                if re.search(r'\bsave-resize\s*\[.*?\]', new_query):
+                    matches = re.search(r'\bsave-resize\s*\[(.*?)\]', query)
+                    save_resize = matches.group(1).strip()
+                    new_query = re.sub(r'\bsave-resize\b\s*\[.*?\]', '', new_query)
+                    new_query = re.sub(r'\s+', ' ', new_query).strip()
+                else:
+                    new_query = new_query.strip().replace("save-resize", "")
+            else:
+                if not word_before_last_bracket(query):
+                    save_resize_list.append(result_save_resize)
+
+            if word_before_last_bracket(query):
+                word_before = word_before_last_bracket(query)
+
+                if word_before == "save-resize":
+
+                    new_query = new_query.strip().replace("[", "")
+                    new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+                    if new_query == "":
+                        everything_matches = everything_search("save-resize")
+                    else:
+                        everything_matches = everything_search(new_query)
+
+                    if everything_matches:
+                        for match in everything_matches:
+                            match_result = Result(Title=match,
+                                                  AutoCompleteText=match,
+                                                  JsonRPCAction=JsonRPCAction(method="change",
+                                                                              parameters=[query, match + " ]",
+                                                                                          ['save-resize', '[']],
+                                                                              dontHideAfterAction=True))
+
+                            save_resize_list.append(match_result)
+                    else:
+
+                        if new_query == "":
+                            matches = query_windows_search("save-resize")
+
+                        else:
+                            matches = query_windows_search(new_query)
+
+                        if isinstance(matches, list):
+
+                            for match in matches:
+                                match_result = Result(Title=match['SYSTEM.ITEMPATHDISPLAY'],
+                                                      AutoCompleteText=match['SYSTEM.ITEMPATHDISPLAY'],
+                                                      JsonRPCAction=JsonRPCAction(method="change",
+                                                                                  parameters=[query, match + " ]",
+                                                                                              ['save-resize', '[']],
+                                                                                  dontHideAfterAction=True))
+
+                                save_resize_list.append(match_result)
+                        else:
+                            if matches:
+                                match_result = Result(Title=matches['SYSTEM.ITEMPATHDISPLAY'],
+                                                      AutoCompleteText=matches['SYSTEM.ITEMPATHDISPLAY'],
+                                                      JsonRPCAction=JsonRPCAction(method="change",
+                                                                                  parameters=[query, matches + " ]",
+                                                                                              ['save-resize', '[']],
+                                                                                  dontHideAfterAction=True))
+
+                                save_resize_list.append(match_result)
+
+            rr = utils.score_results(new_query.strip(), save_resize_list, match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+            save_resize_path = re.search(r'\s*save-resize\s*\[(.*?)\]', query)
+
+            if save_resize_path:
+                if not os.path.exists(save_resize_path.group(1).strip()):
+                    self._results = [Result(Title='Path doenst exits')]
+
+                else:
+
+                    r = Result(Title='run',
+                               SubTitle='run start command with this parameters')
+
+                    r.JsonRPCAction = JsonRPCAction(method="save_resize",
+                                                    parameters=[save_resize])
+
+                    if not word_before_last_bracket(query):
+                        self.add_result(r)
+        else:
+            r = Result(Title='save-resize',
+                       SubTitle="Save the current resize layout dimensions to a file",
+                       JsonRPCAction=JsonRPCAction(method="change",
+                                                   parameters=[query, 'save-resize [', ['save-resize', '[']],
+                                                   dontHideAfterAction=True))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+    def load_resize(self, query: str, state_j):
+
+        load_resize_list = []
+
+        first_word = get_first_word(query)
+
+        if first_word == 'load-resize':
+
+            load_resize = ''
+
+            new_query = re.sub(r'\s+', ' ', query).strip()
+
+            result_load_resize = Result(Title='load-resize',
+                                        SubTitle="Save the current resize layout dimensions to a file",
+                                        AutoCompleteText="load-resize",
+                                        JsonRPCAction=JsonRPCAction(method="change",
+                                                                    parameters=[query, "load-resize [ ",
+                                                                                ['load-resize', "["]],
+                                                                    dontHideAfterAction=True))
+
+            if 'load-resize' in query:
+                if re.search(r'\bload-resize\s*\[.*?\]', new_query):
+                    matches = re.search(r'\bload-resize\s*\[(.*?)\]', query)
+                    load_resize = matches.group(1).strip()
+                    new_query = re.sub(r'\bload-resize\b\s*\[.*?\]', '', new_query)
+                    new_query = re.sub(r'\s+', ' ', new_query).strip()
+                else:
+                    new_query = new_query.strip().replace("load-resize", "")
+            else:
+                if not word_before_last_bracket(query):
+                    load_resize_list.append(result_load_resize)
+
+            if word_before_last_bracket(query):
+                word_before = word_before_last_bracket(query)
+
+                if word_before == "load-resize":
+
+                    new_query = new_query.strip().replace("[", "")
+                    new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+                    if new_query == "":
+                        everything_matches = everything_search("load-resize")
+                    else:
+                        everything_matches = everything_search(new_query)
+
+                    if everything_matches:
+                        for match in everything_matches:
+                            match_result = Result(Title=match,
+                                                  AutoCompleteText=match,
+                                                  JsonRPCAction=JsonRPCAction(method="change",
+                                                                              parameters=[query, match + " ]",
+                                                                                          ['load-resize', '[']],
+                                                                              dontHideAfterAction=True))
+
+                            load_resize_list.append(match_result)
+                    else:
+
+                        if new_query == "":
+                            matches = query_windows_search("load-resize")
+
+                        else:
+                            matches = query_windows_search(new_query)
+
+                        if isinstance(matches, list):
+
+                            for match in matches:
+                                match_result = Result(Title=match['SYSTEM.ITEMPATHDISPLAY'],
+                                                      AutoCompleteText=match['SYSTEM.ITEMPATHDISPLAY'],
+                                                      JsonRPCAction=JsonRPCAction(method="change",
+                                                                                  parameters=[query, match + " ]",
+                                                                                              ['load-resize', '[']],
+                                                                                  dontHideAfterAction=True))
+
+                                load_resize_list.append(match_result)
+                        else:
+                            if matches:
+                                match_result = Result(Title=matches['SYSTEM.ITEMPATHDISPLAY'],
+                                                      AutoCompleteText=matches['SYSTEM.ITEMPATHDISPLAY'],
+                                                      JsonRPCAction=JsonRPCAction(method="change",
+                                                                                  parameters=[query, matches + " ]",
+                                                                                              ['load-resize', '[']],
+                                                                                  dontHideAfterAction=True))
+
+                                load_resize_list.append(match_result)
+
+            rr = utils.score_results(new_query.strip(), load_resize_list, match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+            load_resize_path = re.search(r'\s*load-resize\s*\[(.*?)\]', query)
+
+            if load_resize_path:
+                if not os.path.exists(load_resize_path.group(1).strip()):
+                    self._results = [Result(Title='Path doenst exits')]
+
+                else:
+                    r = Result(Title='run',
+                               SubTitle='run start command with this parameters')
+
+                    r.JsonRPCAction = JsonRPCAction(method="load_resize",
+                                                    parameters=[load_resize])
+
+                    if not word_before_last_bracket(query):
+                        self.add_result(r)
+        else:
+            r = Result(Title='load-resize',
+                       SubTitle="Save the current resize layout dimensions to a file",
+                       JsonRPCAction=JsonRPCAction(method="change",
+                                                   parameters=[query, 'load-resize [', ['load-resize', '[']],
+                                                   dontHideAfterAction=True))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+    def display_monitor_workspace(self, query: str, state_j):
+
+        display_monitor_workspace_list = []
+
+        first_word = get_first_word(query)
+
+        if first_word == "display-monitor-workspace":
+
+            wk = re.search(r'\bworkspace\s*\[(.*?)\]', query)
+            m = re.search(r'\bmonitor\s*\[(.*?)\]', query)
+
+            new_query = query.strip().replace("display-monitor-workspace", "")
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+            result_monitor = Result(Title='monitor',
+                                    SubTitle="Monitor index (zero-indexed)",
+                                    AutoCompleteText="monitor",
+                                    JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "monitor [ ",
+                                                                                             [
+                                                                                                 'display-monitor-workspace',
+                                                                                                 'monitor',
+                                                                                                 'workspace']],
+                                                                dontHideAfterAction=True))
+
+            if ' monitor ' in query:
+                if re.search(r'\bmonitor\s*\[.*?\]', new_query):
+                    matches = re.search(r'\bmonitor\s*\[(.*?)\]', query)
+                    monitor = matches.group(1).strip()
+                    new_query = re.sub(r'\bmonitor\s*\[.*?\]', '', new_query)
+                    new_query = re.sub(r'\s+', ' ', new_query).strip()
+                else:
+                    new_query = new_query.strip().replace("monitor", "")
+            else:
+                if not word_before_last_bracket(query):
+                    display_monitor_workspace_list.append(result_monitor)
+
+            result_workspace = Result(Title='workspace',
+                                      SubTitle="Workspace index on the specified monitor (zero-indexed)",
+                                      AutoCompleteText="monitor",
+                                      JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "workspace [ ",
+                                                                                               [
+                                                                                                   'display-monitor-workspace',
+                                                                                                   'monitor',
+                                                                                                   'workspace']],
+                                                                  dontHideAfterAction=True))
+
+            if ' workspace ' in query:
+                if re.search(r'\bworkspace\s*\[.*?\]', new_query):
+                    matches = re.search(r'\bworkspace\s*\[(.*?)\]', query)
+                    workspace = matches.group(1).strip()
+                    new_query = re.sub(r'\bworkspace\s*\[.*?\]', '', new_query)
+                    new_query = re.sub(r'\s+', ' ', new_query).strip()
+                else:
+                    new_query = new_query.strip().replace("workspace", "")
+            else:
+                if m and not word_before_last_bracket(query):
+                    display_monitor_workspace_list.append(result_workspace)
+
+            if word_before_last_bracket(query):
+                word_before = word_before_last_bracket(query)
+
+                if word_before == "monitor":
+
+                    new_query = re.sub(r'\s*\[\s*', '', new_query)
+
+                    monitor_index = len(state_j['monitors']['elements'])
+
+                    if not new_query.strip().isdigit():
+                        notdigit = Result(Title='Not a number needs to be a number')
+                        self.add_result(notdigit)
+                    elif monitor_index - 1 < int(new_query.strip()) or int(new_query.strip()) < 0:
+                        outofindex = Result(Title='There is no monitor with that index')
+                        self.add_result(outofindex)
+
+                elif word_before == "workspace":
+
+                    new_query = re.sub(r'\s*\[\s*', '', new_query)
+
+                    workspace_index = len(state_j['monitors']['elements'][int(monitor)]['workspaces']['elements'])
+
+                    if not new_query.strip().isdigit():
+                        notdigit = Result(Title='Not a number needs to be a number')
+                        self.add_result(notdigit)
+                    elif workspace_index - 1 < int(new_query.strip()) or int(new_query.strip()) < 0:
+                        outofindex = Result(Title='There is no workspace with that index')
+                        self.add_result(outofindex)
+
+            rr = utils.score_results(new_query.strip(), display_monitor_workspace_list, match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+            if wk and m:
+                r = Result(Title='run',
+                           SubTitle='run start command with this parameters')
+
+                r.JsonRPCAction = JsonRPCAction(method="display_monitor_workspace",
+                                                parameters=[monitor, workspace])
+
+                if not word_before_last_bracket(query):
+                    self.add_result(r)
+
+        else:
+            r = Result(Title='display-monitor-workspace',
+                       SubTitle="Display the workspace index at monitor index",
+                       JsonRPCAction=JsonRPCAction(method="change",
+                                                   parameters=[query, 'display-monitor-workspace',
+                                                               ['display-monitor-workspace', 'monitor', 'workspace']],
+                                                   dontHideAfterAction=True))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+    def focus(self, query: str, state_j):
+
+        focus_list = []
+
+        first_word = get_first_word(query)
+
+        if first_word == "focus":
+
+            new_query = query.strip().replace('focus', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+            left_result = Result(Title="left",
+                                 SubTitle="",
+                                 JsonRPCAction=JsonRPCAction(method="focus",
+                                                             parameters=['left']))
+
+            right_result = Result(Title="right",
+                                  SubTitle="",
+                                  JsonRPCAction=JsonRPCAction(method="focus",
+                                                              parameters=['right']))
+
+            up_result = Result(Title="up",
+                               SubTitle="",
+                               JsonRPCAction=JsonRPCAction(method="focus",
+                                                           parameters=['up']))
+
+            down_result = Result(Title="down",
+                                 SubTitle="",
+                                 JsonRPCAction=JsonRPCAction(method="focus",
+                                                             parameters=['down']))
+
+            focus_list.append(left_result)
+            focus_list.append(right_result)
+            focus_list.append(up_result)
+            focus_list.append(down_result)
+
+            rr = utils.score_results(new_query, focus_list, match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+        else:
+            r = Result(Title="focus",
+                       SubTitle="Change focus to the window in the specified direction",
+                       JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "focus", ["focus"]],
+                                                   dontHideAfterAction=True))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+
+    def move(self, query: str, state_j):
+
+        move_list = []
+
+        first_word = get_first_word(query)
+
+        if first_word == "move":
+
+            new_query = query.strip().replace('move', '')
+            new_query = re.sub(r'\s+', ' ', new_query).strip()
+
+            left_result = Result(Title="left",
+                                 SubTitle="",
+                                 JsonRPCAction=JsonRPCAction(method="move",
+                                                             parameters=['left']))
+
+            right_result = Result(Title="right",
+                                  SubTitle="",
+                                  JsonRPCAction=JsonRPCAction(method="move",
+                                                              parameters=['right']))
+
+            up_result = Result(Title="up",
+                               SubTitle="",
+                               JsonRPCAction=JsonRPCAction(method="move",
+                                                           parameters=['up']))
+
+            down_result = Result(Title="down",
+                                 SubTitle="",
+                                 JsonRPCAction=JsonRPCAction(method="move",
+                                                             parameters=['down']))
+
+            move_list.append(left_result)
+            move_list.append(right_result)
+            move_list.append(up_result)
+            move_list.append(down_result)
+
+            rr = utils.score_results(new_query, move_list, match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
+        else:
+            r = Result(Title="move",
+                       SubTitle="Move the focused window in the specified direction",
+                       JsonRPCAction=JsonRPCAction(method="change", parameters=[query, "move", ["move"]],
+                                                   dontHideAfterAction=True))
+
+            rr = utils.score_results(query, [r], match_on_empty_query=True)
+
+            for scored_results in rr:
+                self.add_result(scored_results)
 
 
 class Context_menu(Method):
@@ -1093,3 +1557,70 @@ class Quick_load_resize(Method):
 
     def __call__(self):
         self.komorebic.quick_load_resize()
+
+
+class Save_resize(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, path: str):
+        self.komorebic.save_resize(path)
+
+
+class Load_resize(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, path: str):
+        self.komorebic.load_resize(path)
+
+
+class Display_monitor_workspace(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, monitor: str, workspace: str) -> JsonRPCAction:
+        result = self.komorebic.display_monitor_workspace(MONITOR=monitor, WORKSPACE=workspace)
+
+        return api.copy_to_clipboard(result.stderr)
+
+
+class Focus(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, operation_direction: str) -> JsonRPCAction:
+        result = self.komorebic.focus(operation_direction)
+
+        return api.copy_to_clipboard(result.stderr)
+
+
+class Move(Method):
+
+    def __init__(self, komorebic: WKomorebic, pipe, pipename):
+        super().__init__()
+        self.komorebic = komorebic
+        self.pipe = pipe
+        self.pipename = pipename
+
+    def __call__(self, operation_direction: str) -> JsonRPCAction:
+        result = self.komorebic.move(operation_direction)
+
+        return api.copy_to_clipboard(result.stderr)
+

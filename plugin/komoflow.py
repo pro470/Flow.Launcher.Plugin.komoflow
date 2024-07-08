@@ -2,7 +2,8 @@ from pyflowlauncher import Plugin
 from komorebic_client import WKomorebic
 from methods import Query, Context_menu, App_focus, Quickstart, Start, Change, Stop, Check, Configuration, State, \
     Global_state, Gui, Visible_windows, Copy_to_clipboard, Monitor_information, State_query, Subscribe_socket, Unsubscribe_socket, \
-    Subscribe_pipe, Unsubscribe_pipe, Log, Quick_save_resize, Quick_load_resize
+    Subscribe_pipe, Unsubscribe_pipe, Log, Quick_save_resize, Quick_load_resize, Save_resize, Load_resize, Display_monitor_workspace, \
+    Focus, Move
 from utils import create_named_pipe, exit_komoflow, connect_komorebi
 
 
@@ -44,5 +45,10 @@ plugin.add_method(Unsubscribe_pipe(plugin.komorebic, plugin.pipe, plugin.pipenam
 plugin.add_method(Log(plugin.komorebic, plugin.pipe, plugin.pipename))
 plugin.add_method(Quick_save_resize(plugin.komorebic, plugin.pipe, plugin.pipename))
 plugin.add_method(Quick_load_resize(plugin.komorebic, plugin.pipe, plugin.pipename))
+plugin.add_method(Save_resize(plugin.komorebic, plugin.pipe, plugin.pipename))
+plugin.add_method(Load_resize(plugin.komorebic, plugin.pipe, plugin.pipename))
+plugin.add_method(Display_monitor_workspace(plugin.komorebic, plugin.pipe, plugin.pipename))
+plugin.add_method(Focus(plugin.komorebic, plugin.pipe, plugin.pipename))
+plugin.add_method(Move(plugin.komorebic, plugin.pipe, plugin.pipename))
 
 plugin.add_method(Change(plugin.settings))

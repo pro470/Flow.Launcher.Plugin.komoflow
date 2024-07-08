@@ -4,7 +4,7 @@
     "Name": "komoflow",
     "Description": "a komorebi plugin for flow-launcher",
     "Author": "pro470",
-    "Version": "1.0.1",
+    "Version": "1.0.2",
     "Language": "python",
     "Website": "https://github.com/pro470/Flow.Launcher.Plugin.komoflow",
     "IcoPath": "icon.png",

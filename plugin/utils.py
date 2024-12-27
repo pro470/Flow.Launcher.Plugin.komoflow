@@ -542,7 +542,7 @@ def query_windows_search(search_term):
         "pwsh.exe",  # Use 'powershell.exe' to directly call the executable
         "-NoProfile",  # Run without profile
         "-ExecutionPolicy", "Bypass",  # Bypass the execution policy
-        "-File", "plugin\windows_index.ps1",  # Path to the PowerShell script
+        "-File", "plugin/windows_index.ps1",  # Path to the PowerShell script
         "-searchTerm", search_term  # Pass the search term parameter
     ]
 
@@ -624,3 +624,27 @@ def everything_search(search_terms: str):
         everything_result.append(filenamestr)
 
     return everything_result
+
+
+def load_flow_launcher_settings(root_dir: str):
+    # Get the current working directory
+    current_dir = root_dir
+
+    # Navigate two directories back
+    parent_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
+
+    # Go into the Settings directory
+    settings_dir = os.path.join(parent_dir, 'Settings')
+
+    # Path to the Settings.json file
+    settings_file = os.path.join(settings_dir, 'Settings.json')
+
+    # Load the Settings.json file
+    try:
+        with open(settings_file, 'r') as file:
+            settings = json.load(file)
+        return settings
+    except FileNotFoundError:
+        return None
+    except json.JSONDecodeError:
+        return None

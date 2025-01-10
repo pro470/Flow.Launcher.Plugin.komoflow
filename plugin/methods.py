@@ -2467,7 +2467,7 @@ class App_focus(Method):
         self.pipename = pipename
 
     def __call__(self, exe: str, hwnd: int):
-        self.komorebic.focus_exe(exe=[exe], hwnd=[str(hwnd)])
+        self.komorebic.eager_focus(EXE=exe)
 
 
 class Quickstart(Method):

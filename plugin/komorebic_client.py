@@ -15,10 +15,8 @@ class WKomorebic:
                                             text=True) 
         return result 
 
-    def start(self, ffm: bool = False, config: Optional[Iterable[Any]] = None, await_configuration: bool = False, tcp_port: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False) -> CompletedProcess[str]:
+    def start(self, config: Optional[Iterable[Any]] = None, await_configuration: bool = False, tcp_port: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False, bar: bool = False, masir: bool = False, clean_state: bool = False) -> CompletedProcess[str]:
         cmd = [self.path, 'start']
-        if ffm: 
-            cmd.extend(['--ffm'])
         if config:
             cmd.extend(['--config'])
             cmd.extend(config)
@@ -31,24 +29,55 @@ class WKomorebic:
             cmd.extend(['--whkd'])
         if ahk: 
             cmd.extend(['--ahk'])
+        if bar: 
+            cmd.extend(['--bar'])
+        if masir: 
+            cmd.extend(['--masir'])
+        if clean_state: 
+            cmd.extend(['--clean-state'])
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
                                             text=True) 
         return result 
 
-    def stop(self, whkd: bool = False) -> CompletedProcess[str]:
+    def stop(self, whkd: bool = False, ahk: bool = False, bar: bool = False, masir: bool = False) -> CompletedProcess[str]:
         cmd = [self.path, 'stop']
         if whkd: 
             cmd.extend(['--whkd'])
+        if ahk: 
+            cmd.extend(['--ahk'])
+        if bar: 
+            cmd.extend(['--bar'])
+        if masir: 
+            cmd.extend(['--masir'])
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
                                             text=True) 
         return result 
 
-    def check(self) -> CompletedProcess[str]:
+    def kill(self, whkd: bool = False, ahk: bool = False, bar: bool = False, masir: bool = False) -> CompletedProcess[str]:
+        cmd = [self.path, 'kill']
+        if whkd: 
+            cmd.extend(['--whkd'])
+        if ahk: 
+            cmd.extend(['--ahk'])
+        if bar: 
+            cmd.extend(['--bar'])
+        if masir: 
+            cmd.extend(['--masir'])
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def check(self, komorebi_config: Optional[Iterable[Any]] = None) -> CompletedProcess[str]:
         cmd = [self.path, 'check']
+        if komorebi_config:
+            cmd.extend(['--komorebi-config'])
+            cmd.extend(komorebi_config)
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -57,6 +86,14 @@ class WKomorebic:
 
     def configuration(self) -> CompletedProcess[str]:
         cmd = [self.path, 'configuration']
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def bar_configuration(self) -> CompletedProcess[str]:
+        cmd = [self.path, 'bar-configuration']
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -191,30 +228,8 @@ class WKomorebic:
                                             text=True) 
         return result 
 
-    def display_monitor_workspace(self, MONITOR, WORKSPACE) -> CompletedProcess[str]:
-        cmd = [self.path, 'display-monitor-workspace', MONITOR, WORKSPACE]
-        result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True,
-                                            capture_output=True,
-                                            text=True) 
-        return result 
-
     def focus(self, OPERATION_DIRECTION) -> CompletedProcess[str]:
         cmd = [self.path, 'focus', OPERATION_DIRECTION]
-        result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True, 
-                                            capture_output=True,
-                                            text=True) 
-        return result 
-
-    def focus_exe(self, exe: Optional[Iterable[Any]] = None, hwnd: Optional[Iterable[Any]] = None) -> CompletedProcess[str]:
-        cmd = [self.path, 'focus-exe']
-        if exe:
-            cmd.extend(['--exe'])
-            cmd.extend(exe)
-        if hwnd:
-            cmd.extend(['--hwnd'])
-            cmd.extend(hwnd)
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -269,8 +284,48 @@ class WKomorebic:
                                             text=True) 
         return result 
 
+    def eager_focus(self, EXE) -> CompletedProcess[str]:
+        cmd = [self.path, 'eager-focus', EXE]
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
     def stack(self, OPERATION_DIRECTION) -> CompletedProcess[str]:
         cmd = [self.path, 'stack', OPERATION_DIRECTION]
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def unstack(self) -> CompletedProcess[str]:
+        cmd = [self.path, 'unstack']
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def cycle_stack(self, CYCLE_DIRECTION) -> CompletedProcess[str]:
+        cmd = [self.path, 'cycle-stack', CYCLE_DIRECTION]
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def cycle_stack_index(self, CYCLE_DIRECTION) -> CompletedProcess[str]:
+        cmd = [self.path, 'cycle-stack-index', CYCLE_DIRECTION]
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def focus_stack_window(self, TARGET) -> CompletedProcess[str]:
+        cmd = [self.path, 'focus-stack-window', TARGET]
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -303,22 +358,6 @@ class WKomorebic:
 
     def resize_axis(self, AXIS, SIZING) -> CompletedProcess[str]:
         cmd = [self.path, 'resize-axis', AXIS, SIZING]
-        result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True, 
-                                            capture_output=True,
-                                            text=True) 
-        return result 
-
-    def unstack(self) -> CompletedProcess[str]:
-        cmd = [self.path, 'unstack']
-        result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True, 
-                                            capture_output=True,
-                                            text=True) 
-        return result 
-
-    def cycle_stack(self, CYCLE_DIRECTION) -> CompletedProcess[str]:
-        cmd = [self.path, 'cycle-stack', CYCLE_DIRECTION]
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -469,6 +508,14 @@ class WKomorebic:
                                             text=True) 
         return result 
 
+    def close_workspace(self) -> CompletedProcess[str]:
+        cmd = [self.path, 'close-workspace']
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
     def cycle_monitor(self, CYCLE_DIRECTION) -> CompletedProcess[str]:
         cmd = [self.path, 'cycle-monitor', CYCLE_DIRECTION]
         result: CompletedProcess[str] = run(args=cmd, 
@@ -597,14 +644,6 @@ class WKomorebic:
                                             text=True) 
         return result 
 
-    def load_custom_layout(self, PATH) -> CompletedProcess[str]:
-        cmd = [self.path, 'load-custom-layout', PATH]
-        result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True, 
-                                            capture_output=True,
-                                            text=True) 
-        return result 
-
     def flip_layout(self, AXIS) -> CompletedProcess[str]:
         cmd = [self.path, 'flip-layout', AXIS]
         result: CompletedProcess[str] = run(args=cmd, 
@@ -725,22 +764,6 @@ class WKomorebic:
                                             text=True) 
         return result 
 
-    def workspace_custom_layout(self, MONITOR, WORKSPACE, PATH) -> CompletedProcess[str]:
-        cmd = [self.path, 'workspace-custom-layout', MONITOR, WORKSPACE, PATH]
-        result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True, 
-                                            capture_output=True,
-                                            text=True) 
-        return result 
-
-    def named_workspace_custom_layout(self, WORKSPACE, PATH) -> CompletedProcess[str]:
-        cmd = [self.path, 'named-workspace-custom-layout', WORKSPACE, PATH]
-        result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True, 
-                                            capture_output=True,
-                                            text=True) 
-        return result 
-
     def workspace_layout_rule(self, MONITOR, WORKSPACE, AT_CONTAINER_COUNT, LAYOUT) -> CompletedProcess[str]:
         cmd = [self.path, 'workspace-layout-rule', MONITOR, WORKSPACE, AT_CONTAINER_COUNT, LAYOUT]
         result: CompletedProcess[str] = run(args=cmd, 
@@ -751,22 +774,6 @@ class WKomorebic:
 
     def named_workspace_layout_rule(self, WORKSPACE, AT_CONTAINER_COUNT, LAYOUT) -> CompletedProcess[str]:
         cmd = [self.path, 'named-workspace-layout-rule', WORKSPACE, AT_CONTAINER_COUNT, LAYOUT]
-        result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True, 
-                                            capture_output=True,
-                                            text=True) 
-        return result 
-
-    def workspace_custom_layout_rule(self, MONITOR, WORKSPACE, AT_CONTAINER_COUNT, PATH) -> CompletedProcess[str]:
-        cmd = [self.path, 'workspace-custom-layout-rule', MONITOR, WORKSPACE, AT_CONTAINER_COUNT, PATH]
-        result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True, 
-                                            capture_output=True,
-                                            text=True) 
-        return result 
-
-    def named_workspace_custom_layout_rule(self, WORKSPACE, AT_CONTAINER_COUNT, PATH) -> CompletedProcess[str]:
-        cmd = [self.path, 'named-workspace-custom-layout-rule', WORKSPACE, AT_CONTAINER_COUNT, PATH]
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -821,6 +828,30 @@ class WKomorebic:
                                             text=True) 
         return result 
 
+    def toggle_float_override(self) -> CompletedProcess[str]:
+        cmd = [self.path, 'toggle-float-override']
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def toggle_workspace_window_container_behaviour(self) -> CompletedProcess[str]:
+        cmd = [self.path, 'toggle-workspace-window-container-behaviour']
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def toggle_workspace_float_override(self) -> CompletedProcess[str]:
+        cmd = [self.path, 'toggle-workspace-float-override']
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
     def toggle_pause(self) -> CompletedProcess[str]:
         cmd = [self.path, 'toggle-pause']
         result: CompletedProcess[str] = run(args=cmd, 
@@ -861,14 +892,6 @@ class WKomorebic:
                                             text=True) 
         return result 
 
-    def toggle_always_on_top(self) -> CompletedProcess[str]:
-        cmd = [self.path, 'toggle-always-on-top']
-        result: CompletedProcess[str] = run(args=cmd, 
-                                            shell=True, 
-                                            capture_output=True,
-                                            text=True) 
-        return result 
-
     def restore_windows(self) -> CompletedProcess[str]:
         cmd = [self.path, 'restore-windows']
         result: CompletedProcess[str] = run(args=cmd, 
@@ -887,6 +910,14 @@ class WKomorebic:
 
     def unmanage(self) -> CompletedProcess[str]:
         cmd = [self.path, 'unmanage']
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def replace_configuration(self, PATH) -> CompletedProcess[str]:
+        cmd = [self.path, 'replace-configuration', PATH]
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -949,8 +980,8 @@ class WKomorebic:
                                             text=True) 
         return result 
 
-    def float_rule(self, IDENTIFIER, ID) -> CompletedProcess[str]:
-        cmd = [self.path, 'float-rule', IDENTIFIER, ID]
+    def ignore_rule(self, IDENTIFIER, ID) -> CompletedProcess[str]:
+        cmd = [self.path, 'ignore-rule', IDENTIFIER, ID]
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -991,6 +1022,38 @@ class WKomorebic:
 
     def named_workspace_rule(self, IDENTIFIER, ID, WORKSPACE) -> CompletedProcess[str]:
         cmd = [self.path, 'named-workspace-rule', IDENTIFIER, ID, WORKSPACE]
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def clear_workspace_rules(self, MONITOR, WORKSPACE) -> CompletedProcess[str]:
+        cmd = [self.path, 'clear-workspace-rules', MONITOR, WORKSPACE]
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def clear_named_workspace_rules(self, WORKSPACE) -> CompletedProcess[str]:
+        cmd = [self.path, 'clear-named-workspace-rules', WORKSPACE]
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def clear_all_workspace_rules(self) -> CompletedProcess[str]:
+        cmd = [self.path, 'clear-all-workspace-rules']
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def enforce_workspace_rules(self) -> CompletedProcess[str]:
+        cmd = [self.path, 'enforce-workspace-rules']
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -1088,6 +1151,14 @@ class WKomorebic:
                                             text=True) 
         return result 
 
+    def stackbar_mode(self, MODE) -> CompletedProcess[str]:
+        cmd = [self.path, 'stackbar-mode', MODE]
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
     def transparency(self, BOOLEAN_STATE) -> CompletedProcess[str]:
         cmd = [self.path, 'transparency', BOOLEAN_STATE]
         result: CompletedProcess[str] = run(args=cmd, 
@@ -1104,22 +1175,52 @@ class WKomorebic:
                                             text=True) 
         return result 
 
-    def focus_follows_mouse(self, BOOLEAN_STATE, implementation: Optional[Iterable[Any]] = None) -> CompletedProcess[str]:
-        cmd = [self.path, 'focus-follows-mouse', BOOLEAN_STATE]
-        if implementation:
-            cmd.extend(['--implementation'])
-            cmd.extend(implementation)
+    def toggle_transparency(self) -> CompletedProcess[str]:
+        cmd = [self.path, 'toggle-transparency']
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
                                             text=True) 
         return result 
 
-    def toggle_focus_follows_mouse(self, implementation: Optional[Iterable[Any]] = None) -> CompletedProcess[str]:
-        cmd = [self.path, 'toggle-focus-follows-mouse']
-        if implementation:
-            cmd.extend(['--implementation'])
-            cmd.extend(implementation)
+    def animation(self, BOOLEAN_STATE, animation_type: Optional[Iterable[Any]] = None) -> CompletedProcess[str]:
+        cmd = [self.path, 'animation', BOOLEAN_STATE]
+        if animation_type:
+            cmd.extend(['--animation-type'])
+            cmd.extend(animation_type)
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def animation_duration(self, DURATION, animation_type: Optional[Iterable[Any]] = None) -> CompletedProcess[str]:
+        cmd = [self.path, 'animation-duration', DURATION]
+        if animation_type:
+            cmd.extend(['--animation-type'])
+            cmd.extend(animation_type)
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def animation_fps(self, FPS) -> CompletedProcess[str]:
+        cmd = [self.path, 'animation-fps', FPS]
+        result: CompletedProcess[str] = run(args=cmd, 
+                                            shell=True, 
+                                            capture_output=True,
+                                            text=True) 
+        return result 
+
+    def animation_style(self, style: Optional[Iterable[Any]] = None, animation_type: Optional[Iterable[Any]] = None) -> CompletedProcess[str]:
+        cmd = [self.path, 'animation-style']
+        if style:
+            cmd.extend(['--style'])
+            cmd.extend(style)
+        if animation_type:
+            cmd.extend(['--animation-type'])
+            cmd.extend(animation_type)
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -1158,8 +1259,8 @@ class WKomorebic:
                                             text=True) 
         return result 
 
-    def format_app_specific_configuration(self, PATH) -> CompletedProcess[str]:
-        cmd = [self.path, 'format-app-specific-configuration', PATH]
+    def convert_app_specific_configuration(self, PATH) -> CompletedProcess[str]:
+        cmd = [self.path, 'convert-app-specific-configuration', PATH]
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
@@ -1214,17 +1315,19 @@ class WKomorebic:
                                             text=True) 
         return result 
 
-    def enable_autostart(self, config: Optional[Iterable[Any]] = None, ffm: bool = False, whkd: bool = False, ahk: bool = False) -> CompletedProcess[str]:
+    def enable_autostart(self, config: Optional[Iterable[Any]] = None, whkd: bool = False, ahk: bool = False, bar: bool = False, masir: bool = False) -> CompletedProcess[str]:
         cmd = [self.path, 'enable-autostart']
         if config:
             cmd.extend(['--config'])
             cmd.extend(config)
-        if ffm: 
-            cmd.extend(['--ffm'])
         if whkd: 
             cmd.extend(['--whkd'])
         if ahk: 
             cmd.extend(['--ahk'])
+        if bar: 
+            cmd.extend(['--bar'])
+        if masir: 
+            cmd.extend(['--masir'])
         result: CompletedProcess[str] = run(args=cmd, 
                                             shell=True, 
                                             capture_output=True,
